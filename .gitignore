@@ -18,6 +18,11 @@ runtime/
 *.jsonl
 *.pid
 
+# Local Node.js install and test output
+node_modules/
+coverage/
+.nyc_output/
+
 # Local backups
 *.bak
 *.bak-*

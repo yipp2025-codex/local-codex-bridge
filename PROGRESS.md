@@ -315,3 +315,10 @@ Gate 5B 已完成並停止：新版 developer-mode connection 已透過同一條
 - 新增公開 README 與空白 key 範本；Tunnel executable 仍不納入 Git，只引用既有第三方 LICENSE。
 - 驗證結果：npm test 19/19 PASS、兩個 PowerShell launcher 語法 PASS、git diff --check PASS；未讀取 .env.local 內容，只確認檔案存在且非空。
 - 可回復備份保存在 ignored runtime 目錄。本輪未改寫歷史、未設定 remote、未 stage、commit 或 push。
+
+### 2026-08-10 Gate R2 公開可重現性文件修正
+
+- R1 以公開 root commit e3ecef99da101417c405533592da7f0cf10c20ca 驗證程式本體可 fresh clone 重現，結果為 PASS WITH DOC FIXES。
+- 新增 npm lockfile v3；README 已拆分 Quick start、無憑證 MCP-only validation、external-auth Tunnel validation、port 診斷、clean shutdown、本機產物與安全措辭。
+- 本機驗證：npm ci PASS（0 vulnerabilities）、automated tests 19/19 PASS、README 四個 PowerShell 區塊與兩個 launcher 語法 PASS、MCP health／七工具／ping／停止 PASS、.gitignore 回歸 11/11 PASS。
+- Tunnel executable、assigned Tunnel ID 與 API credential 仍屬外部官方流程 dependency；本 Gate 未猜測下載 URL 或 checksum，也未執行 external-auth validation。
