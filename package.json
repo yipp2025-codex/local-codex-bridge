@@ -1,0 +1,15 @@
+{
+  "name": "local-codex-bridge-poc",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Minimal localhost MCP bridge to the official Codex app-server interface.",
+  "scripts": {
+    "start": "node mcp-server.mjs",
+    "test": "node --test",
+    "smoke:live": "node scripts/live-smoke.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

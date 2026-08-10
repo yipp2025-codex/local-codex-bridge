@@ -1,0 +1,24 @@
+# Local credentials and secrets
+.env
+.env.*
+!.env.example
+!.env.local.example
+credentials.json
+auth.json
+*.pem
+*.key
+*.pfx
+*.p12
+
+# Downloaded binaries and runtime state
+bin/**/*.exe
+downloads/
+runtime/
+*.log
+*.jsonl
+*.pid
+
+# Local backups
+*.bak
+*.bak-*
+PROGRESS.md.bak-*
