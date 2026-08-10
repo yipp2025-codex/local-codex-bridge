@@ -30,3 +30,4 @@
 - start-mcp-server.ps1 reports success only after localhost health and the exact seven-tool list pass.
 - start-gate2a.ps1 reports success only after the Tunnel is live and ready and targets the existing localhost MCP endpoint.
 - .env.local, Tunnel binaries, runtime logs, health URLs, PID files, and downloads are local runtime data and must not be committed to Git.
+- Public releases are cut from the independent public Git history and do not include the original private repository history, credentials, downloaded Tunnel binaries, or local runtime state.

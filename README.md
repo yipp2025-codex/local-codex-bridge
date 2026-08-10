@@ -5,6 +5,8 @@ MCP server through Secure MCP Tunnel. The bridge is intentionally narrow:
 allowlisted tools are read-only, Codex runs in an isolated read-only workspace,
 and failures close without adding background jobs or persistent sessions.
 
+Current release: [v0.1.0 — Initial Public Release](https://github.com/yipp2025-codex/local-codex-bridge/releases/tag/v0.1.0).
+
 ## Requirements
 
 The public quick start and local MCP-only validation require:

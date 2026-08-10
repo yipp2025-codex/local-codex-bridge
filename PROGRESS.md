@@ -322,3 +322,10 @@ Gate 5B 已完成並停止：新版 developer-mode connection 已透過同一條
 - 新增 npm lockfile v3；README 已拆分 Quick start、無憑證 MCP-only validation、external-auth Tunnel validation、port 診斷、clean shutdown、本機產物與安全措辭。
 - 本機驗證：npm ci PASS（0 vulnerabilities）、automated tests 19/19 PASS、README 四個 PowerShell 區塊與兩個 launcher 語法 PASS、MCP health／七工具／ping／停止 PASS、.gitignore 回歸 11/11 PASS。
 - Tunnel executable、assigned Tunnel ID 與 API credential 仍屬外部官方流程 dependency；本 Gate 未猜測下載 URL 或 checksum，也未執行 external-auth validation。
+
+### 2026-08-10 v0.1.0 Public Release Baseline
+
+- v0.1.0 Public Release Baseline established at authoritative public commit 8c8e883357dd48370c2ebcb4d9e01a0e79950fca.
+- Public clean history and fresh-clone reproducibility: PASS.
+- npm ci PASS（0 vulnerabilities）；automated tests 19/19 PASS；PowerShell syntax 2/2 PASS。
+- MCP health PASS；tools/list = 7；ping PASS；clean shutdown PASS；sensitive-data scan = 0 findings。
