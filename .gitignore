@@ -3,6 +3,7 @@
 .env.*
 !.env.example
 !.env.local.example
+project-allowlist.json
 credentials.json
 auth.json
 *.pem

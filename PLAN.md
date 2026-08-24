@@ -40,7 +40,7 @@ candidate GPT data plane and must never be invoked by list/search/read.
 
 ## Runtime isolation
 
-- Do not use, restart, or reconfigure the existing `127.0.0.1:65535` runtime.
+- Do not use, restart, or reconfigure the existing production-like runtime.
 - Candidate tests use an OS-assigned ephemeral port and separate runtime state.
 - Any future Tunnel or Connector probe must use a separate configuration and must not replace the current Connector.
 - Machine-local allowlist configuration remains ignored and is never committed.

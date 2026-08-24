@@ -1,3 +1,9 @@
+param(
+    [Parameter(Mandatory = $true)]
+    [ValidateRange(1, 65535)]
+    [int]$McpPort
+)
+
 $ErrorActionPreference = "Stop"
 
 $root = $PSScriptRoot
@@ -72,7 +78,7 @@ $clientArgs = @(
     "run",
     "--control-plane.tunnel-id", $tunnelId,
     "--control-plane.api-key", "env:CONTROL_PLANE_API_KEY",
-    "--mcp.server-url", "url=http://127.0.0.1:65535/mcp,channel=main",
+    "--mcp.server-url", ("url=http://127.0.0.1:$McpPort/mcp,channel=main"),
     "--health.listen-addr", "127.0.0.1:0",
     "--health.url-file", $healthFile,
     "--pid.file", (Join-Path $runtime "tunnel-client.pid"),

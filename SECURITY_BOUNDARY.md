@@ -1,33 +1,53 @@
-# local-codex-bridge-poc security boundary
+# GPT Read-Only Public Candidate Security Boundary
 
-## MCP caller
+## Transport
 
-- MCP server only listens on 127.0.0.1:65535 and does not accept remote connections.
-- This PoC does not add a request-level token or OAuth. A local process that can reach the loopback port is therefore trusted to call MCP tools.
-- Secure MCP Tunnel control-plane credentials authenticate the Tunnel itself; they are not localhost MCP request authentication.
-- The bridge must not be bound to a non-loopback address. If strong local process authentication is needed later, use an officially supported transport or IPC mechanism rather than guessing or fabricating Tunnel headers.
+- The MCP server binds only to `127.0.0.1`.
+- The candidate port is supplied by the local operator or an OS-assigned test listener; it is never silently taken from another checkout.
+- Request bodies are bounded at 64 KiB, batch requests are rejected, and malformed requests fail closed.
+- Health returns a fixed status and reads no project data.
 
-## Codex delegation
+## Public capability surface
 
-- run_codex_prompt accepts one plain-text prompt, processes one request at a time, uses an ephemeral thread, waits synchronously, and returns plain text.
-- Codex is fixed to the project-local codex-workspace directory. This directory contains no credentials, runtime state, Tunnel state, executable files, or production project data.
-- The bridge does not accept caller-provided command, cwd, model, sandbox, permission, session, process, or file path parameters.
-- The bridge requires Codex :read-only permission profile; interactive approval or input is cancelled and fails closed.
-- Timeout, caller disconnect, Codex unavailable, protocol error, and turn error return structured errors without crashing the MCP server.
-- The bridge exposes no shell, PowerShell, arbitrary command execution, filesystem write, background task, session persistence, or multi-agent tool.
+- `tools/list` exposes `ping`, `list_allowed_projects`, `list_project_files`, `search_project`, and `read_project_file` only.
+- The project tools are the complete public data plane. They do not start processes, invoke a model runtime, execute commands, or write files.
+- There is no public tool for a physical root, drive, cwd, allowlist mutation, or filesystem mutation.
+- Any legacy execution compatibility from another lineage is intentionally outside this candidate profile and is not registered here.
 
-## Project Inspector
+## Allowlist boundary
 
-- The three Project Inspector tools are fixed to the physical Bridge repository root resolved from mcp-server.mjs; callers cannot provide or override a root.
-- list_project_files, search_project, and read_project_file remain read-only and return only relative paths beneath that root.
-- .git, .env*, credential/secret/private-key names, symlinks, junctions, hard links, unsupported text files, and files over 64 KiB fail closed.
-- Top-level bin, codex-workspace, downloads, fixtures, and runtime directories, plus backup artifacts, are excluded from listing, search, and reads.
+- `project-allowlist.json` is machine-local, ignored by Git, and operator-controlled.
+- The public template contains no project roots.
+- MCP returns `project_id`, display name, and availability; physical roots never cross the transport boundary.
+- IDs are bounded by a strict lowercase identifier pattern. Unknown or malformed IDs fail closed.
+- Missing `project_id` deterministically selects `bridge`; it never selects another project implicitly.
+- Every configured root must be a Windows absolute local path without traversal, UNC, or network syntax.
 
-## Runtime boundary
+## Project-root boundary
 
-- The plain-text prompt is sent over JSONL stdio to the official codex app-server --listen stdio:// interface.
-- The Windows launcher resolves and pins the absolute codex.cmd path, then passes it to the adapter through CODEX_CLI_PATH; the MCP caller cannot override this value.
-- start-mcp-server.ps1 reports success only after localhost health and the exact seven-tool list pass.
-- start-gate2a.ps1 reports success only after the Tunnel is live and ready and targets the existing localhost MCP endpoint.
-- .env.local, Tunnel binaries, runtime logs, health URLs, PID files, and downloads are local runtime data and must not be committed to Git.
-- Public releases are cut from the independent public Git history and do not include the original private repository history, credentials, downloaded Tunnel binaries, or local runtime state.
+- The selected root must be a physical directory and its canonical path must equal the configured path.
+- All configured roots are canonically resolved and checked for overlap before a read.
+- Caller paths are relative-only. Absolute, drive, UNC, network, traversal, empty-segment, NUL, and invalid-name inputs fail closed.
+- Candidate paths are checked before and after canonical resolution, including containment rechecks during file reads.
+- Symlink and junction entries are rejected. Hard-linked files are rejected for direct reads and skipped during bounded enumeration.
+- `.git`, `.env*`, allowlist configuration, credential/secret names, private-key extensions, and known transient or generated directories are excluded.
+- Unsupported extensions, binary/NUL content, invalid UTF-8, non-regular files, and files over 64 KiB fail closed.
+
+## Bounded output
+
+- Directory depth, entries, scanned files, search results, snippets, request bodies, and file content have explicit limits.
+- Results expose only normalized relative paths; no physical root or canonical absolute path is returned.
+- Different allowlisted projects cannot cross-read one another through relative paths, overlap, or link escapes.
+
+## Non-capabilities
+
+The candidate does not expose execution, shell, command, browser, background,
+retry, session, duplex, steering, cancellation, or write/edit/delete
+capabilities. A project read has no process, child process, or session side
+effect.
+
+## Runtime and release boundary
+
+- Candidate runtime state, Tunnel configuration, credentials, logs, binaries, and generated files remain local and ignored.
+- A separate test Tunnel or Connector must target only the candidate's isolated MCP port.
+- The existing production-like runtime, Connector, branch, and Tunnel are not part of this candidate and must not be changed during validation.

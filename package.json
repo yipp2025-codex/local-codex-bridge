@@ -3,11 +3,10 @@
   "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "Minimal localhost MCP bridge to the official Codex app-server interface.",
+  "description": "Minimal localhost MCP bridge for bounded GPT read-only project inspection.",
   "scripts": {
     "start": "node mcp-server.mjs",
-    "test": "node --test",
-    "smoke:live": "node scripts/live-smoke.mjs"
+    "test": "node --test"
   },
   "engines": {
     "node": ">=20"
