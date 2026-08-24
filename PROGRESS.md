@@ -2,6 +2,15 @@
 
 更新時間：2026-08-10
 
+## 2026-08-24 GPT Read-Only Public Release Candidate Gate：進行中
+
+- Candidate lineage is isolated from `local/account-login` and starts at public `origin/main` commit `809faac4f9db16179e0f4895cd4253bea143c0ff`.
+- Candidate branch: `release/gpt-readonly-public`; the operator-local worktree is separate from the protected production-like checkout.
+- `PLAN.md` records the allowed read-only data plane, explicit exclusions, runtime isolation, rollback point, and acceptance Gates.
+- No `/codex/stream`, duplex, steer/cancel, session/resume, shell, write, background, browser, or arbitrary-root capability may enter this candidate.
+- No public Connector, Tunnel, production-like runtime, or existing `local/account-login` checkout has been changed in this Gate.
+
+
 ## 目前狀態
 
 **基礎傳輸層已完成且穩定（Gate 2C：PASS）。**
