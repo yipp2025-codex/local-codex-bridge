@@ -1,22 +1,72 @@
 # GPT Read-Only Project Bridge
 
-This release candidate is a narrow localhost MCP server for bounded,
-read-only project inspection. ChatGPT can select a pre-authorized `project_id`
-and then list, search, or read text beneath that project's fixed local root.
-The public data plane does not expose physical paths and does not provide an
-execution or mutation capability.
+> Let ChatGPT use MCP to read only the local projects you explicitly
+> authorize—then search, read, and analyze them directly in the ChatGPT
+> conversation.
 
-Candidate status: `v0.2.0-gpt-readonly-rc2` (local candidate only; not pushed).
+Public v0.2.0 is a bounded, read-only project data plane. It does not expose
+physical roots or provide an execution or mutation capability.
+
+**The public v0.2.0 read-only runtime does not use Codex.**
+
+## 30-second overview
+
+```text
+ChatGPT
+   │ MCP
+   ▼
+GPT Read-Only Project Bridge
+   │ allowlisted roots only
+   ├── project_a
+   ├── project_b
+   └── notes / knowledge base
+
+bounded list/search/read · no write · no shell · no Codex runtime
+```
+
+## Why use it?
+
+### Project investigation
+
+Ask ChatGPT: “Find where this feature is implemented and explain the call
+flow.”
+
+### Cross-project comparison
+
+Ask: “Compare how `project_a` and `project_b` implement configuration loading.”
+
+### Code + knowledge base
+
+Ask: “Read my code project and notes project, then identify possible
+documentation drift between the knowledge cards and the current implementation.”
+
+The bridge does not modify or synchronize notes, Obsidian, or any project.
+
+## Capability matrix
+
+| Capability | Public v0.2.0 |
+|---|---|
+| Read allowlisted projects | Yes |
+| Multi-project discovery | Yes |
+| Search text | Yes |
+| Read bounded text files | Yes |
+| Cross-project analysis in ChatGPT | Yes, from returned content |
+| Modify files | No |
+| Delete files | No |
+| Shell / PowerShell execution | No |
+| Arbitrary command execution | No |
+| Start Codex | No |
+| Codex runtime dependency | No |
+| Arbitrary filesystem access | No |
 
 ## Runtime independence
 
-The formal GPT Read-Only Project Bridge runtime does not use Codex for project
-reading. It does not call Codex, launch the Codex CLI, create a Codex
-app-server, create a Codex process, or create a Codex session/thread. The
-list/search/read path does not consume Codex as an execution path. The server
-returns bounded project content, and GPT/ChatGPT analyzes that content in the
-conversation. This statement describes this bridge architecture only; it does
-not make any promise about ChatGPT product limits, quotas, or rate limits.
+The formal read-only runtime does not call Codex, launch the Codex CLI, create
+a Codex app-server, create a Codex process, or create a Codex session/thread.
+The list/search/read path does not consume Codex as an execution path. The
+server returns bounded project content, and GPT/ChatGPT analyzes that content
+in the conversation. This describes this bridge architecture only; it makes
+no promise about ChatGPT product limits, quotas, or rate limits.
 
 ## Requirements
 
@@ -27,35 +77,71 @@ not make any promise about ChatGPT product limits, quotas, or rate limits.
 No model CLI, project shell, or write-capable dependency is required for the
 read-only MCP server.
 
-## Local validation
+## Quick start
 
-Install the tracked dependency tree and run the tests:
+1. Clone the public repository:
+
+   ~~~powershell
+   git clone https://github.com/yipp2025-codex/local-codex-bridge.git
+   cd local-codex-bridge
+   ~~~
+
+2. Install the tracked dependency tree:
+
+   ~~~powershell
+   npm ci
+   ~~~
+
+3. Create the machine-local allowlist from the empty template:
+
+   ~~~powershell
+   Copy-Item project-allowlist.example.json project-allowlist.json
+   ~~~
+
+4. Add one or more logical project IDs and their pre-authorized local roots to
+   `project-allowlist.json`, using the schema below. GPT can submit only the
+   logical IDs; it cannot submit or change the physical roots.
+
+5. Start the MCP server on an isolated port:
+
+   ~~~powershell
+   .\start-mcp-server.ps1 -Port <isolated-port>
+   ~~~
+
+   The launcher returns the PID and port only after `/healthz` and the exact
+   public read-only tool list are ready.
+
+6. If your separately approved deployment requires a Secure MCP Tunnel, start
+   it with the same isolated MCP port:
+
+   ~~~powershell
+   .\start-gate2a.ps1 -McpPort <isolated-port>
+   ~~~
+
+7. In ChatGPT, use your approved MCP/Connector setup, confirm discovery shows
+   the five public tools, and ask ChatGPT to inspect an allowlisted project.
+   The repository does not provide or change an authentication policy for an
+   external Connector.
+
+The public runtime does not automatically scan the computer. Without an
+external allowlist entry, only the deterministic built-in `bridge` project is
+available.
+
+## Validate locally
+
+Install the tracked dependency tree and run the regression tests:
 
 ~~~powershell
 npm ci
 npm test
 ~~~
 
-For an isolated runtime, choose a port that is separate from any existing
-service and start the server with that port:
-
-~~~powershell
-.\start-mcp-server.ps1 -Port <isolated-port>
-~~~
-
-The launcher returns only after `/healthz` and the exact public read-only tool
-list are ready. It never uses the production-like localhost port from another
-checkout.
-
 ## Machine-local project allowlist
 
 The server always includes the built-in `bridge` project rooted at this
 checkout. Additional projects are operator-controlled in the ignored file
-`project-allowlist.json`. Begin from the empty public template if needed:
-
-~~~powershell
-Copy-Item project-allowlist.example.json project-allowlist.json
-~~~
+`project-allowlist.json`. Use the empty public template shown in Quick start
+when creating it.
 
 The template contains no project roots. The actual machine-local schema is an
 object whose `projects` value is an array of project descriptors. For example,
@@ -107,6 +193,25 @@ malformed, or path-shaped project IDs fail closed.
 The project tools accept only allowlisted IDs and relative paths or search
 queries. They never accept a physical root, drive, cwd, UNC path, or network
 path.
+
+## Example prompts
+
+These prompts ask for analysis only:
+
+- “Inspect `project_a` and explain its architecture.”
+- “Search `project_a` for authentication handling and summarize the flow.”
+- “Compare how `project_a` and `project_b` implement configuration loading.”
+- “Compare my code project with my notes project and identify possible
+  documentation drift.”
+
+The bridge does not run tests, execute shell commands, install packages, or
+write the requested answer back into a project.
+
+## Why the repository name still says `codex`
+
+This project originally started as a local Codex bridge. The public v0.2.0
+read-only runtime no longer uses Codex; the repository name is retained for
+project continuity.
 
 ## Security boundary
 
@@ -189,8 +294,8 @@ with the same isolated MCP port:
 Do not point this candidate at another checkout's runtime or replace an
 existing Connector without a separate release approval.
 
-## Candidate boundary
+## Public release boundary
 
-This candidate is intended for human review before any public repository push,
-release publication, or Connector cutover. It contains only the project
-read-only data plane and its bounded localhost transport.
+This public release contains only the project read-only data plane and its
+bounded localhost transport. It does not change an existing Connector or
+local runtime; any future Connector cutover is a separate operational change.

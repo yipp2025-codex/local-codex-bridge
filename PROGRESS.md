@@ -65,3 +65,13 @@ Updated: 2026-08-24
 - Documentation consistency review passed for tool names/count, read-only behavior, allowlist/default behavior, physical-path privacy, Codex independence, and stop/remove semantics.
 - RC1 runtime implementation, tool schemas, security implementation, launcher implementation, and tests are unchanged; this RC2 changes only `README.md` and `PROGRESS.md`.
 - RC2 is frozen by a documentation-only local commit and tag after this evidence file is committed; no push, merge, Connector switch, Tunnel switch, or production-like runtime change is permitted.
+
+## Public README Presentation Polish Gate: PASS
+
+- Baseline public `main` and `v0.2.0-gpt-readonly` remain at the qualified RC2 commit/tree.
+- Updated only `README.md` and this `PROGRESS.md`; runtime, security implementation, MCP schema, launcher, package behavior, and tests are unchanged.
+- README now leads with the product position, a simple ChatGPT → MCP → allowlisted roots diagram, three read-only use cases, a capability matrix, repository-name clarification, Quick Start, and analysis-only example prompts.
+- Existing allowlist, physical-root privacy, bounded read, fail-closed security, stop/remove, and Codex=0 documentation remains present and consistent with the implementation.
+- Markdown fence/table/link sanity passed; the diagram is plain text and requires no Mermaid runtime.
+- `npm test` passed `16/16`; `git diff --check` passed; runtime/code diff is zero.
+- This gate creates one documentation-only public-main commit. It creates no new version tag or GitHub Release and does not change the existing release tag.
