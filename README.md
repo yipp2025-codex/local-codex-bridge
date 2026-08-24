@@ -6,7 +6,17 @@ and then list, search, or read text beneath that project's fixed local root.
 The public data plane does not expose physical paths and does not provide an
 execution or mutation capability.
 
-Candidate status: `v0.2.0-gpt-readonly-rc1` (local candidate only; not pushed).
+Candidate status: `v0.2.0-gpt-readonly-rc2` (local candidate only; not pushed).
+
+## Runtime independence
+
+The formal GPT Read-Only Project Bridge runtime does not use Codex for project
+reading. It does not call Codex, launch the Codex CLI, create a Codex
+app-server, create a Codex process, or create a Codex session/thread. The
+list/search/read path does not consume Codex as an execution path. The server
+returns bounded project content, and GPT/ChatGPT analyzes that content in the
+conversation. This statement describes this bridge architecture only; it does
+not make any promise about ChatGPT product limits, quotas, or rate limits.
 
 ## Requirements
 
@@ -47,9 +57,39 @@ checkout. Additional projects are operator-controlled in the ignored file
 Copy-Item project-allowlist.example.json project-allowlist.json
 ~~~
 
-The template contains no project roots. Add only pre-authorized Windows roots locally;
-never commit the populated file. MCP exposes only
-the project ID, display name, and availability.
+The template contains no project roots. The actual machine-local schema is an
+object whose `projects` value is an array of project descriptors. For example,
+these are generic placeholders, not real user roots:
+
+~~~json
+{
+  "projects": [
+    {
+      "project_id": "project_a",
+      "display_name": "Project A",
+      "root": "D:\\approved\\project-a"
+    },
+    {
+      "project_id": "project_b",
+      "display_name": "Project B",
+      "root": "D:\\approved\\project-b"
+    }
+  ]
+}
+~~~
+
+`project_id` is the logical ID GPT supplies to the tools. `root` is the
+physical Windows directory chosen by the local operator; GPT cannot provide or
+change it. To add a second or third project, add another descriptor to this
+local file, using a new valid logical ID and an existing pre-authorized root.
+The file is machine-local, Git-ignored, and must not be committed. The
+allowlist is loaded when the MCP process starts, so restart the MCP server
+after changing it. A Tunnel does not need to restart when it continues to
+point at the same MCP port.
+
+MCP exposes only the project ID, display name, and availability. External
+projects are never added automatically; only the built-in `bridge` project is
+deterministically available without an external allowlist entry.
 
 If `project_id` is omitted, the tools deterministically use `bridge`. Unknown,
 malformed, or path-shaped project IDs fail closed.
@@ -80,6 +120,59 @@ link.
 
 The allowlist has no MCP mutation tool. Adding, changing, or removing a
 project requires a local operator change and a new deployment.
+
+## Stop service
+
+`start-mcp-server.ps1` prints the exact MCP PID and port after readiness. Stop
+only that verified PID; do not stop every `node.exe` process:
+
+~~~powershell
+$mcpPid = <PID printed by start-mcp-server.ps1>
+$mcp = Get-CimInstance Win32_Process -Filter "ProcessId = $mcpPid"
+$nodePath = (Get-Command node.exe -ErrorAction Stop).Path
+if ($null -eq $mcp -or
+    $mcp.Name -ne "node.exe" -or
+    [System.IO.Path]::GetFullPath($mcp.ExecutablePath) -ne [System.IO.Path]::GetFullPath($nodePath) -or
+    $mcp.CommandLine -notlike "*mcp-server.mjs*") {
+  throw "PID is not the expected MCP server"
+}
+Stop-Process -Id $mcpPid
+~~~
+
+Confirm that the exact PID is gone and that the selected MCP port has no
+listener:
+
+~~~powershell
+Get-Process -Id $mcpPid -ErrorAction SilentlyContinue
+Get-NetTCPConnection -State Listen -LocalPort <isolated-port> -ErrorAction SilentlyContinue
+~~~
+
+If the optional Secure MCP Tunnel is running, its launcher also prints a PID
+and records it in `runtime\\gate2a-live\\tunnel-client.pid`. Verify that the
+PID is the candidate's `bin\\v0.0.11\\tunnel-client.exe` before stopping only
+that PID:
+
+~~~powershell
+$tunnelPid = [int](Get-Content -LiteralPath .\runtime\gate2a-live\tunnel-client.pid -Raw)
+$tunnel = Get-CimInstance Win32_Process -Filter "ProcessId = $tunnelPid"
+$tunnelPath = (Resolve-Path -LiteralPath .\bin\v0.0.11\tunnel-client.exe).Path
+if ($null -eq $tunnel -or
+    $tunnel.Name -ne "tunnel-client.exe" -or
+    [System.IO.Path]::GetFullPath($tunnel.ExecutablePath) -ne [System.IO.Path]::GetFullPath($tunnelPath)) {
+  throw "PID is not the expected candidate Tunnel"
+}
+Stop-Process -Id $tunnelPid
+Get-Process -Id $tunnelPid -ErrorAction SilentlyContinue
+~~~
+
+## Remove / uninstall
+
+After stopping the services, remove or disable this Bridge's Connector from
+ChatGPT separately. Then, if desired, remove the machine-local
+`project-allowlist.json` and delete the local clone/install directory that you
+explicitly selected. Removing or disabling a Connector does not delete local
+files. Removing the Bridge must not delete the user-authorized project
+directories themselves.
 
 ## Optional Secure MCP Tunnel
 

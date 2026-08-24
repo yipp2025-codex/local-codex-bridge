@@ -55,3 +55,13 @@ Updated: 2026-08-24
 - Final lineage audit found only the read-only data plane, transport narrowing, tests, documentation, and launcher parameterization.
 - The candidate is frozen by a local commit and RC tag after this evidence file is committed; its commit/tree identities are reported separately.
 - No push, merge, public release update, Connector switch, or Tunnel switch was performed.
+
+## RC2 — Documentation-only gate: PASS
+
+- Parent RC1 freeze: `18b5c18998b438cf0e89393cdb9eebc5fb957402` / tree `66998acec68e930260cac708159e387e1c82af57`.
+- Blocker A fixed: README explicitly states that the project-read runtime does not call, launch, or create Codex processes, app-servers, or sessions; GPT analyzes bounded returned content in ChatGPT.
+- Blocker B fixed: README documents the implementation-verified `projects` array schema, logical `project_id`, local physical `root`, Git ignore rule, external-project setup, and MCP restart requirement.
+- Blocker C fixed: README documents exact-PID MCP/Tunnel stop verification, port/process confirmation, Connector disablement, safe allowlist removal, and preservation of user project directories.
+- Documentation consistency review passed for tool names/count, read-only behavior, allowlist/default behavior, physical-path privacy, Codex independence, and stop/remove semantics.
+- RC1 runtime implementation, tool schemas, security implementation, launcher implementation, and tests are unchanged; this RC2 changes only `README.md` and `PROGRESS.md`.
+- RC2 is frozen by a documentation-only local commit and tag after this evidence file is committed; no push, merge, Connector switch, Tunnel switch, or production-like runtime change is permitted.
