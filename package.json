@@ -1,14 +1,25 @@
 {
-  "name": "local-codex-bridge-poc",
-  "version": "0.2.0",
-  "private": true,
+  "name": "stateful-agent-relay",
+  "version": "1.0.0-stateful-relay.1",
+  "private": false,
   "type": "module",
-  "description": "Minimal localhost MCP bridge for bounded GPT read-only project inspection.",
+  "description": "A bounded durable mailbox between GPT and a native Codex session.",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./stateful-agent-relay-store.mjs",
+    "./notification": "./stateful-agent-relay-notification.mjs",
+    "./manual-dispatch": "./stateful-agent-relay-manual-dispatch.mjs",
+    "./recovery": "./stateful-agent-relay-recovery.mjs",
+    "./operator": "./stateful-agent-relay-operator.mjs",
+    "./consumer": "./stateful-agent-relay-consumer.mjs",
+    "./native-consumer": "./native-agent-relay-consumer.mjs",
+    "./lifecycle": "./stateful-agent-relay-lifecycle.mjs",
+    "./schema": "./stateful-relay-result.schema.json"
+  },
   "scripts": {
-    "start": "node mcp-server.mjs",
     "test": "node --test"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.5.0"
   }
 }

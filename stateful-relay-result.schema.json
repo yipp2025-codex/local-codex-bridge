@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "changed_files",
+    "target_sha256",
+    "size",
+    "git_status",
+    "summary"
+  ],
+  "properties": {
+    "status": {
+      "const": "completed"
+    },
+    "changed_files": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "string",
+        "pattern": "^[^\\\\/][^\\\\]*$",
+        "maxLength": 512
+      }
+    },
+    "target_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "size": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "git_status": {
+      "type": "string",
+      "maxLength": 4096
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 4096
+    }
+  }
+}
