@@ -12,12 +12,22 @@
     "./recovery": "./stateful-agent-relay-recovery.mjs",
     "./operator": "./stateful-agent-relay-operator.mjs",
     "./consumer": "./stateful-agent-relay-consumer.mjs",
+    "./bounded-write": "./stateful-relay-bounded-write.mjs",
+    "./native-bounded-write": "./stateful-relay-native-bounded-write.mjs",
+    "./native-mailbox-bounded-write": "./stateful-relay-native-mailbox-bounded-write.mjs",
+    "./native-skill-installer": "./stateful-relay-native-skill-installer.mjs",
     "./native-consumer": "./native-agent-relay-consumer.mjs",
     "./lifecycle": "./stateful-agent-relay-lifecycle.mjs",
-    "./schema": "./stateful-relay-result.schema.json"
+    "./schema": "./stateful-relay-result.schema.json",
+    "./mcp-adapter": "./stateful-relay-mcp-adapter.mjs",
+    "./mcp-server": "./mcp-server.mjs"
   },
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "start": "node mcp-server.mjs",
+    "bounded-write-consumer": "node stateful-relay-native-bounded-write.mjs",
+    "bounded-write-mailbox-consumer": "node stateful-relay-native-mailbox-bounded-write.mjs",
+    "bounded-write-skill-installer": "node stateful-relay-native-skill-installer.mjs --once"
   },
   "engines": {
     "node": ">=22.5.0"

@@ -326,6 +326,21 @@ export function createOperatorApi({
       ...(alias === null ? {} : { project_alias: alias }),
       result_body: result.result_body,
       revision: result.revision,
+      ...(Array.isArray(result.changed_files)
+        ? { changed_files: result.changed_files }
+        : {}),
+      ...(result.result_correlation ? { result_correlation: result.result_correlation } : {}),
+      ...(result.scope_evidence ? { scope_evidence: result.scope_evidence } : {}),
+      ...(result.mutation_evidence ? { mutation_evidence: result.mutation_evidence } : {}),
+      ...(result.expected_write_evidence
+        ? { expected_write_evidence: result.expected_write_evidence }
+        : {}),
+      ...(result.capability_consumption
+        ? { capability_consumption: result.capability_consumption }
+        : {}),
+      ...(result.runtime_identity
+        ? { runtime_identity: result.runtime_identity }
+        : {}),
       receipt: `RESULT task=${result.task_id}`,
     };
   }

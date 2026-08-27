@@ -1,0 +1,30 @@
+# Deployment-local project roots and credentials
+.env
+.env.*
+!.env.example
+!.env.local.example
+project-allowlist.json
+credentials.json
+auth.json
+*.pem
+*.key
+*.pfx
+*.p12
+
+# Relay database and runtime evidence
+runtime/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.log
+*.jsonl
+*.pid
+
+# Local Node.js install and test output
+node_modules/
+coverage/
+.nyc_output/
+
+# Local backups
+*.bak
+*.bak-*
