@@ -8,7 +8,7 @@
 - Public backport base: `v1.0.0-stateful-relay.2`
 - Public backport base commit: `a821d99e600666fce1a070a85663d22430763ab0`
 - Frozen file count: `42`
-- Accepted candidate-byte inventory SHA-256: `041825ef932f1283d39840f63115941d03f0dbca11265435aa16f2f1dfabe8b7`
+- Accepted candidate-byte inventory SHA-256: `e2d511d6e3bc9e01f7ec3c0e13315660a8c8b235e0c81fa64a3e6013f15b3d28`
 - Canonical Git-blob inventory SHA-256: `a97f9de8f72c396b39d6e09e3c3d0615c5a9cfd0bab2d0373e32c715ac2b3a84`
 - Inventory format: UTF-8, paths bytewise sorted, one
   `relative_path<TAB>size_bytes<TAB>sha256<LF>` record per frozen file.
