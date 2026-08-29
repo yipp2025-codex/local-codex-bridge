@@ -252,10 +252,10 @@ test("machine evidence promotes only the correlated pending read-only notificati
   });
 });
 
-test("current retest identity is promoted only by evidence, not helper hard-code", async () => {
+test("explicit synthetic identity is promoted only by evidence, not helper hard-code", async () => {
   await withFixture(async ({ store, spool }) => {
-    const taskId = "94038a35-8bc1-4e90-82f9-e6dcf183f46d";
-    const notificationId = "be5e8de5-6205-4b70-aa06-71544115406a";
+    const taskId = "11111111-1111-4111-8111-111111111111";
+    const notificationId = "22222222-2222-4222-8222-222222222222";
     const generated = createReadyTask(store, { taskId });
     remapNotificationIdForFixture(store, generated.notification_id, notificationId);
     markLegacy(store, notificationId);
@@ -294,7 +294,7 @@ test("wrong correlation, wrong notification, and generation drift cannot promote
     );
     const wrongNotification = classifyStatefulRelayWakeRecoveryEvidence(
       store.database,
-      evidenceEnvelope([recoveryEvidenceRecord("94038a35-8bc1-41e8-9f3a-51b0cde22f62")]),
+      evidenceEnvelope([recoveryEvidenceRecord("33333333-3333-4333-8333-333333333333")]),
       classificationOptions(spool),
     );
     assert.deepEqual(wrongNotification.updated_notification_ids, []);
@@ -322,7 +322,7 @@ test("duplicate or tampered evidence is rejected without delivery promotion", as
       () => classifyStatefulRelayWakeRecoveryEvidence(
         store.database,
         evidenceEnvelope([recoveryEvidence(store, notification, {
-          evidence_id: "legacy-wake-recovery:94038a35-8bc1-41e8-9f3a-51b0cde22f62",
+          evidence_id: "legacy-wake-recovery:33333333-3333-4333-8333-333333333333",
         })]),
         classificationOptions(spool),
       ),
@@ -756,7 +756,7 @@ test("pre-claim reconciliation rejects unsafe or unverifiable boundaries", async
 test("evidence reader accepts only bounded deployment evidence and never exposes task bodies", async () => {
   await withFixture(async ({ spool }) => {
     const file = path.join(spool, "evidence.json");
-    const notificationId = "94038a35-8bc1-41e8-9f3a-51b0cde22f62";
+    const notificationId = "33333333-3333-4333-8333-333333333333";
     await writeFile(file, JSON.stringify(evidenceEnvelope([recoveryEvidenceRecord(notificationId)])));
     const parsed = readStatefulRelayWakeRecoveryEvidence(file);
     assert.equal(parsed.records.length, 1);

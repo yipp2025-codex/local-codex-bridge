@@ -21,7 +21,7 @@ import {
 } from "../stateful-relay-native-wakeup.mjs";
 
 const PROJECTS = ["classroom", "investment", "exam", "second_brain"];
-const PHASE_A_TASK_ID = "fec294db-1451-41e8-9f3a-51b0cde22f62";
+const SYNTHETIC_PHASE_A_TASK_ID = "44444444-4444-4444-8444-444444444444";
 const GPT_CAPABILITY = "a".repeat(64);
 const CODEX_CAPABILITY = "b".repeat(64);
 
@@ -255,11 +255,11 @@ test("9b terminal notification with READY task is a bounded NOOP", async () => {
 test("10 historical oldest READY task is not selected", async () => {
   await withFixture(async ({ store, projectRegistry }) => {
     const historical = createReadyTask(store, { body: "obsolete historical pending" });
-    const phase = createReadyTask(store, { taskId: PHASE_A_TASK_ID, body: "Phase A classroom smoke" });
+    const phase = createReadyTask(store, { taskId: SYNTHETIC_PHASE_A_TASK_ID, body: "Phase A classroom smoke" });
     const result = await oneShot({ store, projectRegistry }).processSignal(
       createStatefulRelayWakeSignal({ store, notificationId: phase.notification.notification_id }),
     );
-    assert.equal(result.task_id, PHASE_A_TASK_ID);
+    assert.equal(result.task_id, SYNTHETIC_PHASE_A_TASK_ID);
     assert.equal(store.readTask(historical.taskId).task.state, "READY_FOR_CODEX");
   });
 });
@@ -281,10 +281,10 @@ test("11 stale notification correlation is rejected", async () => {
 
 test("12 explicit Phase A correlation selects the existing acceptance identity", async () => {
   await withFixture(async ({ store, projectRegistry }) => {
-    const phase = createReadyTask(store, { taskId: PHASE_A_TASK_ID, body: "Phase A classroom smoke" });
+    const phase = createReadyTask(store, { taskId: SYNTHETIC_PHASE_A_TASK_ID, body: "Phase A classroom smoke" });
     const signal = createStatefulRelayWakeSignal({ store, notificationId: phase.notification.notification_id });
     const result = await oneShot({ store, projectRegistry }).processSignal(signal);
-    assert.equal(result.task_id, PHASE_A_TASK_ID);
+    assert.equal(result.task_id, SYNTHETIC_PHASE_A_TASK_ID);
   });
 });
 

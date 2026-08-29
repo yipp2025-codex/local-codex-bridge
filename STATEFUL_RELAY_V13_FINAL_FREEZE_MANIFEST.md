@@ -8,7 +8,7 @@
 - Public backport base: `v1.0.0-stateful-relay.2`
 - Public backport base commit: `a821d99e600666fce1a070a85663d22430763ab0`
 - Frozen file count: `39`
-- Canonical inventory SHA-256: `524585e3af8e49a4f085129b4469da25abd2eb2cc2ad8a626a0dcaa1caa81a9a`
+- Canonical inventory SHA-256: `eb9a03589c2ba116195582555434e74063b1df9c744ae63d535d179406b0adb2`
 - Canonical inventory format: UTF-8, paths bytewise sorted, one
   `relative_path<TAB>size_bytes<TAB>sha256<LF>` record per frozen file.
 - This manifest is excluded from the canonical inventory to avoid recursive
@@ -93,11 +93,11 @@ They contain no physical project mapping or owner/runtime identity.
 | `tests/stateful-agent-relay-recovery.test.mjs` | 16174 | `ee9eab8cc6d37392b7fcb45a1eac0827ff57de658a8128cfa9b122350367d7bb` |
 | `tests/stateful-relay-legacy-migration.test.mjs` | 16012 | `8a805b779e4f338a7c681ea0ecacfa15cf9c1d2fc61c72ae7e52f5e87bc50f35` |
 | `tests/stateful-relay-mcp-deployment-gates.test.mjs` | 9693 | `29fdcae1daebf41ea625b2a1dee3737458215367ac96f9bec943c22cc468f637` |
-| `tests/stateful-relay-native-readonly-executor.test.mjs` | 22562 | `24fff540d6726df7102dda8c33cf8030e6fe34d4e44e3c00131dfdf5f470973f` |
+| `tests/stateful-relay-native-readonly-executor.test.mjs` | 22827 | `d45d3f98e7f2fb3d955bb1f9a025565ae0e0672d2df69b284a53d7ba8e0ae3d4` |
 | `tests/stateful-relay-native-skill-installer.test.mjs` | 18527 | `f419ad968795cc9e90cec4fc87215e5869cb072e0482ade4f933f22a812383f5` |
-| `tests/stateful-relay-native-wakeup.test.mjs` | 22400 | `ed3108b79523abc6ec788a5d30feeea31931b9a1e44250332c534cbb54ceecb3` |
+| `tests/stateful-relay-native-wakeup.test.mjs` | 22450 | `b60d1fefb147658d7eeedd1aabc590dcb49e071a7cfcb03e6070a968f858db68` |
 | `tests/stateful-relay-v13-multi-project-dispatch.test.mjs` | 18000 | `7e414f1a8c2d7d25492111e3fb1fecf706921f4ef1adb29a3292741aaaaa6fcb` |
-| `tests/stateful-relay-wake-delivery.test.mjs` | 33598 | `9ebc0315d044bf79d6e3a574ef0580c03b1c7b709fb86d134353c0126f87e53a` |
+| `tests/stateful-relay-wake-delivery.test.mjs` | 33602 | `c4927225437f245011174d9c3baf6307fda6f86bd45619571bc0113753ac640f` |
 | `tests/stateful-relay-wake-recovery-claim-metadata.test.mjs` | 23850 | `e5c16f37aba0431fcaf21b76c98ac8f56db82958c7b8ca57d859358660d0ab2d` |
 | `tests/stateful-relay-wake-resume.test.mjs` | 15021 | `a4d3001bfb4ec8bea52c72c66c2299e9d3a10fc112b5882895217505eb695b7d` |
 | `tests/windows-stateful-relay-native-wakeup-sink.test.mjs` | 7651 | `80a71f716acb066aca9a4fbe14376a73067450bd685a546ba2997dfb74e935d5` |

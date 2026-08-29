@@ -288,8 +288,17 @@ test("successful controls use the same parser and persist fixed outcome evidence
   }
 });
 
-test("deployment-mapped four-project fixture uses actual trusted repository roots", async () => {
-  const mapping = JSON.parse(await readFile(new URL("../project-allowlist.json", import.meta.url), "utf8"));
+test("public four-project fixture uses isolated trusted repository roots", async () => {
+  const fixtureRoot = path.join(authorityRoot, "trusted-projects");
+  const mapping = {
+    projects: ["classroom", "investment", "exam", "second_brain"].map((projectId) => ({
+      project_id: projectId,
+      root: path.join(fixtureRoot, projectId),
+    })),
+  };
+  for (const project of mapping.projects) {
+    mkdirSync(path.join(project.root, ".git"), { recursive: true });
+  }
   assert.deepEqual(mapping.projects.map(({ project_id: projectId }) => projectId).sort(), [
     "classroom", "exam", "investment", "second_brain",
   ]);
