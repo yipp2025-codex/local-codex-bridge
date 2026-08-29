@@ -773,8 +773,7 @@ test("recovery source contains no task creation or caller target parameters", as
   const recoverySourcePath = path.resolve(
     path.dirname(fileURLToPath(import.meta.url)),
     "..",
-    "..",
-    "stateful-relay-v12-autostart",
+    "deployment",
     "recover-next-stateful-relay-native-wake.mjs",
   );
   const source = await readFile(recoverySourcePath, "utf8");
