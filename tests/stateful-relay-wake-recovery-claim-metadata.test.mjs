@@ -8,7 +8,7 @@ import test from "node:test";
 
 import {
   requireAuthoritativeReread,
-} from "../../stateful-relay-v12-autostart/recover-next-stateful-relay-native-wake.mjs";
+} from "../deployment/recover-next-stateful-relay-native-wake.mjs";
 import {
   createStatefulRelayWakeSignal,
 } from "../stateful-relay-native-wakeup.mjs";

@@ -18,10 +18,9 @@ import {
   reserveStatefulRelayWakeResume,
   readStatefulRelayWakeDelivery,
 } from "../stateful-relay-wake-delivery.mjs";
-import { resumeNextStatefulRelayNativeWake } from "../../stateful-relay-v12-autostart/resume-next-stateful-relay-native-wake.mjs";
+import { resumeNextStatefulRelayNativeWake } from "../deployment/resume-next-stateful-relay-native-wake.mjs";
 
 const PROJECTS = ["classroom", "investment", "exam", "second_brain"];
-const V12_ROOT = path.resolve(import.meta.dirname, "..", "..", "stateful-relay-v12-autostart");
 
 async function withFixture(callback) {
   const root = await mkdtemp(path.join(os.tmpdir(), "stateful-relay-wake-resume-"));
@@ -252,16 +251,21 @@ test("signal correlation mismatch is rejected while the existing signal remains 
   });
 });
 
-test("zero-parameter resume entrypoint selects the disposable live pending signal and never materializes it", async () => {
-  const sourceConfig = JSON.parse(await readFile(
-    path.join(V12_ROOT, "config", "stateful-relay-native-wake-recovery.json"),
-    "utf8",
-  ));
+test("zero-parameter resume entrypoint selects a disposable pending signal and never materializes it", async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), "stateful-relay-wake-resume-live-copy-"));
   const databasePath = path.join(root, "relay.sqlite");
   const spool = path.join(root, "signals");
   const configPath = path.join(root, "recovery.json");
+  const registryPath = path.join(root, "execution-registry.json");
   await mkdir(spool);
+  await writeFile(registryPath, JSON.stringify({
+    version: "stateful-relay-execution-registry/v1",
+    projects: PROJECTS.map((projectId) => ({
+      project_id: projectId,
+      enabled: true,
+      allowed_execution_modes: ["read_only"],
+    })),
+  }, null, 2), "utf8");
   const setupStore = await openStatefulRelayStore(databasePath);
   const taskId = randomUUID();
   let notificationId;
@@ -303,9 +307,12 @@ test("zero-parameter resume entrypoint selects the disposable live pending signa
     setupStore.close();
   }
   await writeFile(configPath, JSON.stringify({
-    ...sourceConfig,
+    version: "stateful-relay-native-wake-recovery/v1",
+    candidate_root: path.resolve(import.meta.dirname, ".."),
     database_path: databasePath,
+    execution_registry_path: registryPath,
     signal_spool_directory: spool,
+    node_runtime_path: process.execPath,
     recovery_evidence_path: path.join(root, "evidence.json"),
   }, null, 2), "utf8");
   try {
@@ -344,14 +351,10 @@ test("zero-parameter resume entrypoint selects the disposable live pending signa
   }
 });
 
-test("resume source is zero-parameter, does not rematerialize, and never accepts a target", async () => {
+test("generic resume source is zero-parameter, does not rematerialize, and never accepts a target", async () => {
   const { readFile } = await import("node:fs/promises");
-  const root = path.resolve(import.meta.dirname, "..", "..", "stateful-relay-v12-autostart");
-  const wrapper = await readFile(path.join(root, "resume-next-stateful-relay-native-wake.ps1"), "utf8");
+  const root = path.resolve(import.meta.dirname, "..", "deployment");
   const entrypoint = await readFile(path.join(root, "resume-next-stateful-relay-native-wake.mjs"), "utf8");
-  assert.match(wrapper, /param\(\)/u);
-  assert.match(wrapper, /Read-FrozenDeploymentOwnerSid|Get-CurrentWindowsTokenSid/u);
-  assert.doesNotMatch(wrapper, /TaskId|NotificationId|SignalId|ProjectId|Start-ScheduledTask|CredWrite/u);
   assert.match(entrypoint, /listStatefulRelayWakeResumeCandidates/u);
   assert.match(entrypoint, /reserveStatefulRelayWakeResume/u);
   assert.match(entrypoint, /requestWindowsStatefulRelayWakeup/u);

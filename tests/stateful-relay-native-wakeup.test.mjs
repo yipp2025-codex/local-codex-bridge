@@ -512,8 +512,7 @@ test("30 native one-shot wires fixed recoverable pre-claim reconciliation withou
     path.resolve(
       import.meta.dirname,
       "..",
-      "..",
-      "stateful-relay-v12-autostart",
+      "deployment",
       "stateful-relay-native-wakeup-once.mjs",
     ),
     "utf8",

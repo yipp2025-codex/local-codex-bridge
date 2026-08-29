@@ -7,8 +7,8 @@
 - Freeze date: `2026-08-29`
 - Public backport base: `v1.0.0-stateful-relay.2`
 - Public backport base commit: `a821d99e600666fce1a070a85663d22430763ab0`
-- Frozen file count: `39`
-- Canonical inventory SHA-256: `eb9a03589c2ba116195582555434e74063b1df9c744ae63d535d179406b0adb2`
+- Frozen file count: `42`
+- Canonical inventory SHA-256: `041825ef932f1283d39840f63115941d03f0dbca11265435aa16f2f1dfabe8b7`
 - Canonical inventory format: UTF-8, paths bytewise sorted, one
   `relative_path<TAB>size_bytes<TAB>sha256<LF>` record per frozen file.
 - This manifest is excluded from the canonical inventory to avoid recursive
@@ -80,6 +80,9 @@ They contain no physical project mapping or owner/runtime identity.
 |---|---:|---|
 | `deployment/STATEFUL_RELAY_ORCHESTRATOR_SKILL_V13_WAKEUP_CANDIDATE.md` | 942 | `3b97279cdc73f9800e8a5fb5d590e45dccbe97b2729ec2016f74b23d32d6e7f7` |
 | `deployment/STATEFUL_RELAY_V13_NATIVE_WAKEUP_DEPLOYMENT_PLAN.md` | 2744 | `7246e13e717b7ebafb5dae5bf564ee9dc5c1ae0ce5c4203b60df3078ba1e7934` |
+| `deployment/recover-next-stateful-relay-native-wake.mjs` | 7540 | `5f321522377fe096d97319733db1e15fe1bba26fb768cf387c699bbe74576123` |
+| `deployment/resume-next-stateful-relay-native-wake.mjs` | 7631 | `c2f663b653c5ca1963517d22592ac121bf020f781e226d16f53048bdcc09cd10` |
+| `deployment/stateful-relay-native-wakeup-once.mjs` | 23707 | `7e60a3c3d0f3c1fa9da1d514fe9899a7e008f19cc7667ee017b7e05677300f3b` |
 | `deployment/stateful-relay-v13-execution-registry.example.json` | 539 | `86773eafe2cd4a18f98c5c42c73cd6043e8857572cc0dd2369e4741c921d622b` |
 | `deployment/windows-stateful-relay-native-wakeup-sink.mjs` | 9929 | `f1f77143ab31eda95d19d61dfbbf111482b97c9384ae8cff0053e09c7e1d41e2` |
 
@@ -95,11 +98,11 @@ They contain no physical project mapping or owner/runtime identity.
 | `tests/stateful-relay-mcp-deployment-gates.test.mjs` | 9693 | `29fdcae1daebf41ea625b2a1dee3737458215367ac96f9bec943c22cc468f637` |
 | `tests/stateful-relay-native-readonly-executor.test.mjs` | 22827 | `d45d3f98e7f2fb3d955bb1f9a025565ae0e0672d2df69b284a53d7ba8e0ae3d4` |
 | `tests/stateful-relay-native-skill-installer.test.mjs` | 18527 | `f419ad968795cc9e90cec4fc87215e5869cb072e0482ade4f933f22a812383f5` |
-| `tests/stateful-relay-native-wakeup.test.mjs` | 22450 | `b60d1fefb147658d7eeedd1aabc590dcb49e071a7cfcb03e6070a968f858db68` |
+| `tests/stateful-relay-native-wakeup.test.mjs` | 22420 | `4fb7cf94f22317bd1ce501f5288cb9c51a409edc1f60e42058bade40ee47d86c` |
 | `tests/stateful-relay-v13-multi-project-dispatch.test.mjs` | 18000 | `7e414f1a8c2d7d25492111e3fb1fecf706921f4ef1adb29a3292741aaaaa6fcb` |
-| `tests/stateful-relay-wake-delivery.test.mjs` | 33602 | `c4927225437f245011174d9c3baf6307fda6f86bd45619571bc0113753ac640f` |
-| `tests/stateful-relay-wake-recovery-claim-metadata.test.mjs` | 23850 | `e5c16f37aba0431fcaf21b76c98ac8f56db82958c7b8ca57d859358660d0ab2d` |
-| `tests/stateful-relay-wake-resume.test.mjs` | 15021 | `a4d3001bfb4ec8bea52c72c66c2299e9d3a10fc112b5882895217505eb695b7d` |
+| `tests/stateful-relay-wake-delivery.test.mjs` | 33574 | `96cbbe1db9b59968d33d32f580a677df6a3a7cade3ef32ee669b298a481d1e74` |
+| `tests/stateful-relay-wake-recovery-claim-metadata.test.mjs` | 23829 | `40207409b0ad002740b192c30e22404982d4809f6e33117e37742a81aecb4bbd` |
+| `tests/stateful-relay-wake-resume.test.mjs` | 14919 | `2ff7535d64e69d80980ac897ee8f39629906ad00bba1a79139ed1b50e7cdf7af` |
 | `tests/windows-stateful-relay-native-wakeup-sink.test.mjs` | 7651 | `80a71f716acb066aca9a4fbe14376a73067450bd685a546ba2997dfb74e935d5` |
 
 ## Public-safe configuration and documentation identities
@@ -123,7 +126,7 @@ They contain no physical project mapping or owner/runtime identity.
 | candidate Node full suite | `254/254 PASS` |
 | deployment Node suites | `42/42 PASS` |
 | deployment PowerShell suite files | `17/17 PASS` |
-| candidate Node syntax | `45/45 PASS` |
+| candidate Node syntax | `48/48 PASS` |
 | deployment Node syntax | `10/10 PASS` |
 | deployment PowerShell syntax | `42/42 PASS` |
 | MCP transport and eight-tool surface | `PASS` |
@@ -131,7 +134,7 @@ They contain no physical project mapping or owner/runtime identity.
 | bounded-write regression | `PASS` |
 | Wake Bridge, NativeWakeup, recovery, resume, and pre-claim reconciliation | `PASS` |
 | Native executor, repository preflight, and dual-output parser | `PASS` |
-| public package dry-run | `68 files PASS` |
+| public package dry-run | `71 files PASS` |
 | leakage and forbidden-artifact scan | `PASS` |
 | Git whitespace check | `PASS` |
 
@@ -184,9 +187,10 @@ The following are excluded from the public backport and package:
 - machine SID, personal path, process identity, live task/result evidence, and
   incident-specific recovery payloads.
 
-Deployment-local operational helpers that contain deployment-fixed bindings are
-not copied verbatim. Their generic security contracts are represented by the
-public source, tests, and deployment examples above.
+Deployment-local owner-bound wrappers and private bindings are not copied
+verbatim. The public recovery, resume, and one-shot entrypoints are sanitized,
+package-root-bound generic implementations; owner SID and machine-specific
+configuration remain deployment-local.
 
 ## Acceptance and limitations
 
