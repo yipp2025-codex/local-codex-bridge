@@ -237,6 +237,7 @@ test("inbox claims one task and report uses hidden current claim authority", asy
     const mail = operator.invokePhrase("CODEX", "收信");
     assert.deepEqual(Object.keys(mail).sort(), [
       "claim_generation",
+      "execution_mode",
       "project_id",
       "receipt",
       "status",
@@ -246,6 +247,7 @@ test("inbox claims one task and report uses hidden current claim authority", asy
     assert.equal(mail.status, "TASK");
     assert.equal(mail.task_id, sent.task_id);
     assert.equal(mail.project_id, "stateful-agent-relay");
+    assert.equal(mail.execution_mode, "read_only");
     assert.equal(mail.task_body, "operator task");
     assert.equal(operator.current_task_id, sent.task_id);
     assert.equal(mail.receipt, `CLAIMED task=${sent.task_id} generation=1`);
@@ -331,11 +333,18 @@ test("results returns exact durable body, leaves review independent, and preserv
       status: "completed",
       task_id: completed.task_id,
       project_id: "stateful-agent-relay",
+      execution_mode: "read_only",
       project_alias: "relay",
       result_body: "RESULT_BODY_EXACT",
+      result_correlation: result.result_correlation,
       revision: 3,
       receipt: `RESULT task=${completed.task_id}`,
     });
+    assert.equal(result.result_correlation.task_id, completed.task_id);
+    assert.equal(result.result_correlation.project_id, "stateful-agent-relay");
+    assert.equal(result.result_correlation.execution_mode, "read_only");
+    assert.equal(result.result_correlation.claim_owner, "operator-codex-result");
+    assert.equal(result.result_correlation.claim_generation, 1);
     assert.deepEqual(operator.results(), {
       status: "EMPTY",
       receipt: "NO_PENDING_RESULTS",
@@ -372,6 +381,7 @@ test("resume and status are read-only, bounded, and do not ACK, reclaim, or revi
     assert.deepEqual(resumed.items[0], {
       task_id: sent.task_id,
       project_id: "stateful-agent-relay",
+      execution_mode: "read_only",
       state: "READY_FOR_CODEX",
       revision: 1,
       next_actor: "CODEX",

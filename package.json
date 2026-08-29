@@ -1,6 +1,6 @@
 {
   "name": "stateful-agent-relay",
-  "version": "1.0.0-stateful-relay.1",
+  "version": "1.0.0-stateful-relay.3",
   "private": false,
   "type": "module",
   "description": "A bounded durable mailbox between GPT and a native Codex session.",
@@ -20,6 +20,10 @@
     "./lifecycle": "./stateful-agent-relay-lifecycle.mjs",
     "./schema": "./stateful-relay-result.schema.json",
     "./mcp-adapter": "./stateful-relay-mcp-adapter.mjs",
+    "./execution-registry": "./stateful-relay-execution-registry.mjs",
+    "./native-wakeup": "./stateful-relay-native-wakeup.mjs",
+    "./native-readonly-executor": "./stateful-relay-native-readonly-executor.mjs",
+    "./windows-native-wakeup-sink": "./deployment/windows-stateful-relay-native-wakeup-sink.mjs",
     "./mcp-server": "./mcp-server.mjs"
   },
   "scripts": {

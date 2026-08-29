@@ -38,10 +38,23 @@ function eventTypeFor(event) {
   if (type === "turn.completed" || type === "turn/completed") {
     return "completion";
   }
+  if (type === "response.completed") {
+    return "completion";
+  }
+  if (type === "response.in_progress") {
+    return "task_activity";
+  }
   if (type === "error" || type === "turn.failed") {
     return "error";
   }
-  if (type === "item/started" || type === "item.started") {
+  if (
+    type === "item/started" ||
+    type === "item.started" ||
+    type === "item/updated" ||
+    type === "item.updated" ||
+    type === "response.output_item.added" ||
+    type === "response.output_item.done"
+  ) {
     return itemType.toLowerCase().includes("command") ? "tool_call" : "task_activity";
   }
   if (type === "item/completed" || type === "item.completed") {

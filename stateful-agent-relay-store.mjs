@@ -15,6 +15,10 @@ import {
 import {
   STATEFUL_RELAY_SKILL_PAYLOAD_MANIFEST_SHA256,
 } from "./stateful-relay-skill-payload.mjs";
+import {
+  ensureStatefulRelayWakeDeliveryRow,
+  ensureStatefulRelayWakeDeliverySchema,
+} from "./stateful-relay-wake-delivery.mjs";
 
 export const RELAY_ACTORS = Object.freeze(["GPT", "CODEX", "SYSTEM"]);
 export const RELAY_STATES = Object.freeze([
@@ -69,12 +73,59 @@ export const RELAY_CLAIM_LEASE_MS = 15 * 60 * 1000;
 
 const TASK_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u;
 const PROJECT_ID_PATTERN = /^[a-z0-9][a-z0-9._-]{0,63}$/u;
+const RELAY_EXECUTION_MODES = Object.freeze(["read_only", "bounded_write"]);
 const CLIENT_REQUEST_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u;
 const CLAIM_OWNER_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u;
 const EVENT_ID_PATTERN = /^[0-9a-f-]{36}$/u;
 const NOTIFICATION_ID_PATTERN = /^[0-9a-f-]{36}$/u;
 const CAPABILITY_ID_PATTERN = /^[0-9a-f-]{36}$/u;
 const SHA256_PATTERN = /^[a-f0-9]{64}$/u;
+const EXECUTION_OUTCOME_EXIT_CLASSIFICATIONS = new Set([
+  "CODEX_EXIT_0",
+  "CODEX_EXIT_NONZERO",
+  "CODEX_TIMEOUT",
+  "CODEX_PROCESS_ERROR",
+]);
+const EXECUTION_OUTCOME_PARSER_CLASSIFICATIONS = new Set([
+  "FINAL_AGENT_MESSAGE_FOUND",
+  "FINAL_AGENT_MESSAGE_ABSENT",
+  "STRUCTURED_OUTPUT_MALFORMED",
+  "STRUCTURED_OUTPUT_EMPTY",
+  "UNEXPECTED_EVENT_SHAPE",
+]);
+const EXECUTION_OUTCOME_JSONL_LIFECYCLE_CLASSIFICATIONS = new Set([
+  "JSONL_LIFECYCLE_VALID",
+  "TERMINAL_ERROR_EVENT",
+  "STRUCTURED_OUTPUT_MALFORMED",
+  "STRUCTURED_OUTPUT_EMPTY",
+  "UNEXPECTED_EVENT_SHAPE",
+]);
+const EXECUTION_OUTCOME_OUTPUT_CLASSIFICATIONS = new Set([
+  "OUTPUT_LAST_MESSAGE_FOUND",
+  "OUTPUT_LAST_MESSAGE_ABSENT",
+  "OUTPUT_LAST_MESSAGE_EMPTY",
+  "OUTPUT_LAST_MESSAGE_INVALID",
+]);
+const EXECUTION_OUTCOME_STDERR_CLASSIFICATIONS = new Set([
+  "STDERR_EMPTY",
+  "STDERR_PRESENT",
+  "STDERR_TRUNCATED",
+  "STDERR_UNAVAILABLE",
+]);
+const EXECUTION_OUTCOME_FAILURE_CLASSIFICATIONS = new Set([
+  "NATIVE_CODEX_PROCESS_ERROR",
+  "NATIVE_CODEX_PROCESS_START_FAILED",
+  "NATIVE_CODEX_EXIT_NONZERO",
+  "NATIVE_CODEX_TIMEOUT",
+  "NATIVE_CODEX_OUTPUT_CONTRACT_FAILED",
+  "NATIVE_CODEX_JSONL_LIFECYCLE_FAILED",
+  "NATIVE_CODEX_OUTPUT_LAST_MESSAGE_FAILED",
+  "NATIVE_CODEX_OUTPUT_CONTRACT_CONFLICT",
+]);
+const EXECUTION_OUTCOME_STAGES = new Set([
+  "CODEX_PROCESS_START",
+  "CODEX_EXECUTION",
+]);
 const STATEFUL_RELAY_SKILL_INSTALL_PROTOCOL = "stateful-relay-skill-install/v1";
 const STATEFUL_RELAY_SKILL_INSTALL_OPERATION = STATEFUL_RELAY_CAPABILITY_OPERATION;
 const STATEFUL_RELAY_SKILL_INSTALL_SCOPE = STATEFUL_RELAY_CAPABILITY_TARGET_SCOPE_ID;
@@ -92,6 +143,9 @@ PRAGMA busy_timeout = 3000;
 CREATE TABLE IF NOT EXISTS tasks (
   task_id TEXT PRIMARY KEY,
   project_id TEXT NOT NULL,
+  execution_mode TEXT NOT NULL DEFAULT 'read_only' CHECK (
+    execution_mode IN ('read_only', 'bounded_write')
+  ),
   state TEXT NOT NULL CHECK (state IN (
     'CREATED', 'READY_FOR_CODEX', 'CLAIMED', 'RUNNING',
     'RESULT_READY', 'REVIEWED', 'COMPLETED', 'FAILED'
@@ -274,6 +328,16 @@ function validateProjectId(value) {
     throw new StatefulRelayError("RELAY_INVALID_PROJECT_ID", "project_id format is invalid");
   }
   return projectId;
+}
+
+function validateExecutionMode(value = "read_only") {
+  if (!RELAY_EXECUTION_MODES.includes(value)) {
+    throw new StatefulRelayError(
+      "RELAY_INVALID_EXECUTION_MODE",
+      "execution_mode is not allowed",
+    );
+  }
+  return value;
 }
 
 function validateActor(value) {
@@ -666,6 +730,69 @@ function normalizeLifecycle(value) {
   lifecycle.authentication_source = typeof value.authentication_source === "string"
     ? value.authentication_source.slice(0, 128)
     : null;
+  const enumField = (field, allowed, code) => {
+    if (value[field] === undefined || value[field] === null) return null;
+    if (typeof value[field] !== "string" || !allowed.has(value[field])) {
+      throw new StatefulRelayError(code, `execution lifecycle ${field} is invalid`);
+    }
+    return value[field];
+  };
+  lifecycle.executor_stage = enumField(
+    "executor_stage",
+    EXECUTION_OUTCOME_STAGES,
+    "RELAY_EXECUTION_OUTCOME_INVALID",
+  );
+  lifecycle.exit_classification = enumField(
+    "exit_classification",
+    EXECUTION_OUTCOME_EXIT_CLASSIFICATIONS,
+    "RELAY_EXECUTION_OUTCOME_INVALID",
+  );
+  lifecycle.parser_classification = enumField(
+    "parser_classification",
+    EXECUTION_OUTCOME_PARSER_CLASSIFICATIONS,
+    "RELAY_EXECUTION_OUTCOME_INVALID",
+  );
+  lifecycle.jsonl_lifecycle_classification = enumField(
+    "jsonl_lifecycle_classification",
+    EXECUTION_OUTCOME_JSONL_LIFECYCLE_CLASSIFICATIONS,
+    "RELAY_EXECUTION_OUTCOME_INVALID",
+  );
+  lifecycle.output_last_message_classification = enumField(
+    "output_last_message_classification",
+    EXECUTION_OUTCOME_OUTPUT_CLASSIFICATIONS,
+    "RELAY_EXECUTION_OUTCOME_INVALID",
+  );
+  lifecycle.authoritative_final_message_source = enumField(
+    "authoritative_final_message_source",
+    new Set(["output_last_message"]),
+    "RELAY_EXECUTION_OUTCOME_INVALID",
+  );
+  lifecycle.stderr_classification = enumField(
+    "stderr_classification",
+    EXECUTION_OUTCOME_STDERR_CLASSIFICATIONS,
+    "RELAY_EXECUTION_OUTCOME_INVALID",
+  );
+  lifecycle.failure_classification = enumField(
+    "failure_classification",
+    EXECUTION_OUTCOME_FAILURE_CLASSIFICATIONS,
+    "RELAY_EXECUTION_OUTCOME_INVALID",
+  );
+  if (value.timed_out !== undefined && value.timed_out !== null && typeof value.timed_out !== "boolean") {
+    throw new StatefulRelayError("RELAY_EXECUTION_OUTCOME_INVALID", "execution lifecycle timed_out is invalid");
+  }
+  lifecycle.timed_out = typeof value.timed_out === "boolean" ? value.timed_out : null;
+  for (const field of [
+    "final_message_count",
+    "jsonl_final_message_count",
+    "structured_output_record_count",
+    "malformed_output_record_count",
+  ]) {
+    if (value[field] !== undefined && value[field] !== null &&
+      (!Number.isSafeInteger(value[field]) || value[field] < 0 || value[field] > 4096)) {
+      throw new StatefulRelayError("RELAY_EXECUTION_OUTCOME_INVALID", `execution lifecycle ${field} is invalid`);
+    }
+    lifecycle[field] = Number.isSafeInteger(value[field]) ? value[field] : null;
+  }
   return lifecycle;
 }
 
@@ -679,11 +806,18 @@ function normalizeOptionalHash(value, code) {
   return value;
 }
 
-function normalizeResultCorrelation(value, { taskId, projectId, resultRevision }) {
-  if (value === undefined || value === null) {
-    return null;
-  }
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
+function normalizeResultCorrelation(value, {
+  taskId,
+  projectId,
+  executionMode,
+  clientRequestId,
+  taskBodySha256,
+  resultRevision,
+  claimOwner,
+  claimGeneration,
+}) {
+  const source = value === undefined || value === null ? {} : value;
+  if (!source || typeof source !== "object" || Array.isArray(source)) {
     throw new StatefulRelayError(
       "RELAY_RESULT_CORRELATION_INVALID",
       "result correlation evidence is invalid",
@@ -692,63 +826,72 @@ function normalizeResultCorrelation(value, { taskId, projectId, resultRevision }
   const allowedKeys = new Set([
     "task_id",
     "project_id",
+    "execution_mode",
     "client_request_id",
     "task_body_sha256",
     "request_sha256",
     "result_revision",
+    "claim_owner",
+    "claim_generation",
     "operation",
     "target_scope_id",
   ]);
-  if (Object.keys(value).some((key) => !allowedKeys.has(key))) {
+  if (Object.keys(source).some((key) => !allowedKeys.has(key))) {
     throw new StatefulRelayError(
       "RELAY_RESULT_CORRELATION_INVALID",
       "result correlation contains an unsupported field",
     );
   }
-  if (value.task_id !== taskId || value.project_id !== projectId) {
+  if (
+    (source.task_id !== undefined && source.task_id !== taskId) ||
+    (source.project_id !== undefined && source.project_id !== projectId) ||
+    (source.execution_mode !== undefined && source.execution_mode !== executionMode) ||
+    (source.claim_owner !== undefined && source.claim_owner !== claimOwner) ||
+    (source.claim_generation !== undefined && source.claim_generation !== claimGeneration)
+  ) {
     throw new StatefulRelayError(
       "RELAY_RESULT_CORRELATION_MISMATCH",
-      "result correlation task or project does not match the Relay task",
+      "result correlation identity does not match the Relay task claim",
     );
   }
   if (
-    value.client_request_id !== null &&
-    (typeof value.client_request_id !== "string" ||
-      value.client_request_id.length > MAX_RELAY_CLIENT_REQUEST_ID_CHARS ||
-      !CLIENT_REQUEST_ID_PATTERN.test(value.client_request_id))
+    source.client_request_id !== undefined &&
+    source.client_request_id !== clientRequestId
   ) {
     throw new StatefulRelayError(
-      "RELAY_RESULT_CORRELATION_INVALID",
-      "result correlation client_request_id is invalid",
+      "RELAY_RESULT_CORRELATION_MISMATCH",
+      "result correlation client_request_id does not match the Relay task",
     );
   }
   if (
-    typeof value.task_body_sha256 !== "string" ||
-    !SHA256_PATTERN.test(value.task_body_sha256) ||
-    typeof value.request_sha256 !== "string" ||
-    !SHA256_PATTERN.test(value.request_sha256)
+    (source.task_body_sha256 !== undefined && source.task_body_sha256 !== taskBodySha256) ||
+    (source.request_sha256 !== undefined && source.request_sha256 !== taskBodySha256)
   ) {
     throw new StatefulRelayError(
-      "RELAY_RESULT_CORRELATION_INVALID",
-      "result correlation SHA-256 evidence is invalid",
+      "RELAY_RESULT_CORRELATION_MISMATCH",
+      "result correlation request identity does not match the Relay task",
     );
   }
-  if (value.result_revision !== resultRevision) {
+  if (source.result_revision !== undefined && source.result_revision !== resultRevision) {
     throw new StatefulRelayError(
       "RELAY_RESULT_CORRELATION_MISMATCH",
       "result correlation revision does not match the next Relay revision",
     );
   }
-  if (typeof value.operation !== "string" || value.operation.length === 0 || value.operation.length > 128) {
+  if (
+    source.operation !== undefined &&
+    (typeof source.operation !== "string" || source.operation.length === 0 || source.operation.length > 128)
+  ) {
     throw new StatefulRelayError(
       "RELAY_RESULT_CORRELATION_INVALID",
       "result correlation operation is invalid",
     );
   }
   if (
-    typeof value.target_scope_id !== "string" ||
-    value.target_scope_id.length === 0 ||
-    value.target_scope_id.length > 128
+    source.target_scope_id !== undefined &&
+    (typeof source.target_scope_id !== "string" ||
+      source.target_scope_id.length === 0 ||
+      source.target_scope_id.length > 128)
   ) {
     throw new StatefulRelayError(
       "RELAY_RESULT_CORRELATION_INVALID",
@@ -758,12 +901,15 @@ function normalizeResultCorrelation(value, { taskId, projectId, resultRevision }
   return {
     task_id: taskId,
     project_id: projectId,
-    client_request_id: value.client_request_id ?? null,
-    task_body_sha256: value.task_body_sha256,
-    request_sha256: value.request_sha256,
+    execution_mode: executionMode,
+    client_request_id: clientRequestId,
+    task_body_sha256: taskBodySha256,
+    request_sha256: taskBodySha256,
     result_revision: resultRevision,
-    operation: value.operation,
-    target_scope_id: value.target_scope_id,
+    claim_owner: claimOwner,
+    claim_generation: claimGeneration,
+    ...(source.operation === undefined ? {} : { operation: source.operation }),
+    ...(source.target_scope_id === undefined ? {} : { target_scope_id: source.target_scope_id }),
   };
 }
 
@@ -1304,11 +1450,36 @@ function isPassingReview(body) {
   }
 }
 
-function normalizeResultBody({ taskId, projectId, status, result, resultRevision }) {
+function normalizeResultBody({
+  taskId,
+  projectId,
+  executionMode,
+  clientRequestId,
+  taskBodySha256,
+  status,
+  result,
+  resultRevision,
+  claimOwner,
+  claimGeneration,
+}) {
   if (!RELAY_RESULT_STATUSES.includes(status)) {
     throw new StatefulRelayError("RELAY_INVALID_RESULT_STATUS", "result status is not allowed");
   }
   const source = result && typeof result === "object" ? result : {};
+  const identityChecks = [
+    ["task_id", taskId],
+    ["project_id", projectId],
+    ["execution_mode", executionMode],
+    ["claim_owner", claimOwner],
+    ["claim_generation", claimGeneration],
+  ];
+  if (identityChecks.some(([key, expected]) =>
+    source[key] !== undefined && source[key] !== expected)) {
+    throw new StatefulRelayError(
+      "RELAY_RESULT_IDENTITY_MISMATCH",
+      "result identity does not match the durable Relay task claim",
+    );
+  }
   if (source.mutation_started !== undefined && typeof source.mutation_started !== "boolean") {
     throw new StatefulRelayError(
       "RELAY_RESULT_MUTATION_STATE_INVALID",
@@ -1330,6 +1501,11 @@ function normalizeResultBody({ taskId, projectId, status, result, resultRevision
   const normalized = {
     task_id: taskId,
     project_id: projectId,
+    execution_mode: executionMode,
+    client_request_id: clientRequestId,
+    task_body_sha256: taskBodySha256,
+    claim_owner: claimOwner,
+    claim_generation: claimGeneration,
     status,
     changed_files: normalizeChangedFiles(source.changed_files),
     target_sha256: typeof source.target_sha256 === "string"
@@ -1356,7 +1532,12 @@ function normalizeResultBody({ taskId, projectId, status, result, resultRevision
     correlation: normalizeResultCorrelation(source.correlation, {
       taskId,
       projectId,
+      executionMode,
+      clientRequestId,
+      taskBodySha256,
       resultRevision,
+      claimOwner,
+      claimGeneration,
     }),
     scope_evidence: normalizeScopeEvidence(source.scope_evidence),
     mutation_evidence: normalizeMutationEvidence(source.mutation_evidence),
@@ -1612,24 +1793,34 @@ export class StatefulRelayStore {
       revision,
       createdAt,
     );
-    return cloneRow(this.database.prepare(`
+    const notification = cloneRow(this.database.prepare(`
       SELECT notification_id, task_id, target_actor, type, state, revision,
              created_at, delivered_at, acknowledged_at
       FROM notifications
       WHERE task_id = ? AND revision = ? AND type = ?
     `).get(taskId, revision, normalizedType));
+    if (normalizedType === "TASK_READY") {
+      ensureStatefulRelayWakeDeliveryRow(this.database, {
+        notificationId: notification.notification_id,
+        taskId,
+        createdAt,
+        now: this.now,
+      });
+    }
+    return notification;
   }
 
   #createTaskInTransaction({
     taskId,
     projectId,
+    executionMode,
     body,
     clientRequestId,
   }) {
     const existingByRequest = clientRequestId === null
       ? null
       : this.database.prepare(`
-        SELECT task_id, project_id
+        SELECT task_id, project_id, execution_mode
         FROM tasks
         WHERE client_request_id = ?
       `).get(clientRequestId);
@@ -1641,6 +1832,7 @@ export class StatefulRelayStore {
       `).get(existingByRequest.task_id);
       if (
         existingByRequest.project_id === projectId &&
+        existingByRequest.execution_mode === executionMode &&
         existingTaskEvent?.body === body
       ) {
         return this.readTask(existingByRequest.task_id);
@@ -1660,13 +1852,14 @@ export class StatefulRelayStore {
     const initialEventId = randomUUID();
     this.database.prepare(`
       INSERT INTO tasks (
-      task_id, project_id, state, created_at, updated_at,
+      task_id, project_id, execution_mode, state, created_at, updated_at,
         current_revision, original_task_event_id, last_event_sha256, claimed_at,
         client_request_id, claim_owner, claim_generation, claim_expires_at
-      ) VALUES (?, ?, 'CREATED', ?, ?, 0, ?, NULL, NULL, ?, NULL, 0, NULL)
+      ) VALUES (?, ?, ?, 'CREATED', ?, ?, 0, ?, NULL, NULL, ?, NULL, 0, NULL)
     `).run(
       taskId,
       projectId,
+      executionMode,
       createdAt,
       createdAt,
       initialEventId,
@@ -1696,14 +1889,22 @@ export class StatefulRelayStore {
     return this.readTask(taskId);
   }
 
-  createTask({ taskId = randomUUID(), projectId, body, clientRequestId = null }) {
+  createTask({
+    taskId = randomUUID(),
+    projectId,
+    executionMode = "read_only",
+    body,
+    clientRequestId = null,
+  }) {
     const normalizedTaskId = validateTaskId(taskId);
     const normalizedProjectId = validateProjectId(projectId);
+    const normalizedExecutionMode = validateExecutionMode(executionMode);
     const taskBody = validateBody(body);
     const normalizedClientRequestId = validateClientRequestId(clientRequestId);
     return this.#transaction(() => this.#createTaskInTransaction({
       taskId: normalizedTaskId,
       projectId: normalizedProjectId,
+      executionMode: normalizedExecutionMode,
       body: taskBody,
       clientRequestId: normalizedClientRequestId,
     }));
@@ -1778,6 +1979,7 @@ export class StatefulRelayStore {
       const task = this.#createTaskInTransaction({
         taskId: randomUUID(),
         projectId: STATEFUL_RELAY_CAPABILITY_PROJECT_ID,
+        executionMode: "bounded_write",
         body: taskBody,
         clientRequestId: normalizedClientRequestId,
       });
@@ -1940,7 +2142,7 @@ export class StatefulRelayStore {
   listReadyTasks({ limit = 16 } = {}) {
     const boundedLimit = Number.isInteger(limit) && limit > 0 ? Math.min(limit, 64) : 16;
     return this.database.prepare(`
-      SELECT task_id, project_id, state, created_at, updated_at, current_revision
+      SELECT task_id, project_id, execution_mode, state, created_at, updated_at, current_revision
       FROM tasks
       WHERE state = 'READY_FOR_CODEX'
       ORDER BY created_at ASC, task_id ASC
@@ -1951,7 +2153,7 @@ export class StatefulRelayStore {
   listStaleTasks({ limit = 16 } = {}) {
     const boundedLimit = Number.isInteger(limit) && limit > 0 ? Math.min(limit, 64) : 16;
     const candidates = this.database.prepare(`
-      SELECT task_id, project_id, state, created_at, updated_at, current_revision,
+      SELECT task_id, project_id, execution_mode, state, created_at, updated_at, current_revision,
              claimed_at, claim_generation, claim_expires_at
       FROM tasks
       WHERE state IN ('CLAIMED', 'RUNNING') AND claim_expires_at IS NOT NULL
@@ -2014,6 +2216,7 @@ export class StatefulRelayStore {
       SELECT
         t.task_id,
         t.project_id,
+        t.execution_mode,
         t.state,
         t.created_at,
         t.updated_at,
@@ -2311,12 +2514,28 @@ export class StatefulRelayStore {
         );
       }
       this.#assertClaimFence(task, normalizedClaimOwner, normalizedClaimGeneration);
+      const taskEvent = this.database.prepare(`
+        SELECT body_sha256
+        FROM events
+        WHERE task_id = ? AND revision = 1 AND type = 'TASK'
+      `).get(normalizedTaskId);
+      if (!taskEvent || !SHA256_PATTERN.test(taskEvent.body_sha256 ?? "")) {
+        throw new StatefulRelayError(
+          "RELAY_TASK_IDENTITY_INVALID",
+          "durable TASK request identity is unavailable",
+        );
+      }
       const body = normalizeResultBody({
         taskId: normalizedTaskId,
         projectId: task.project_id,
+        executionMode: validateExecutionMode(task.execution_mode),
+        clientRequestId: task.client_request_id ?? null,
+        taskBodySha256: taskEvent.body_sha256,
         status,
         result,
         resultRevision: Number(task.current_revision) + 1,
+        claimOwner: normalizedClaimOwner,
+        claimGeneration: normalizedClaimGeneration,
       });
       let parsedBody = null;
       const capability = normalizeCapabilityRow(this.database.prepare(`
@@ -2464,13 +2683,18 @@ export class StatefulRelayStore {
       task: {
         task_id: task.task_id,
         project_id: task.project_id,
+        execution_mode: validateExecutionMode(task.execution_mode),
+        client_request_id: task.client_request_id ?? null,
         state: task.state,
         created_at: task.created_at,
         updated_at: task.updated_at,
         current_revision: task.current_revision,
-        claimed_at: task.claimed_at,
+        // Claim metadata is an internal authoritative contract. Keep nullable
+        // SQLite values explicit so readers never have to interpret undefined.
+        claim_owner: task.claim_owner ?? null,
+        claimed_at: task.claimed_at ?? null,
         claim_generation: Number(task.claim_generation ?? 0),
-        claim_expires_at: task.claim_expires_at,
+        claim_expires_at: task.claim_expires_at ?? null,
       },
       events,
       integrity: {
@@ -2481,47 +2705,255 @@ export class StatefulRelayStore {
   }
 }
 
-function ensureManualDispatchColumns(database) {
-  const columns = new Set(
-    database.prepare("PRAGMA table_info(tasks)").all().map((column) => column.name),
-  );
-  if (!columns.has("client_request_id")) {
-    database.exec("ALTER TABLE tasks ADD COLUMN client_request_id TEXT");
+const LEGACY_BOUNDED_TASK_ENVELOPE_KEYS = Object.freeze([
+  "constraints",
+  "execution_profile",
+  "instruction",
+  "operation",
+  "payload_manifest_sha256",
+  "protocol",
+  "request_id",
+  "target_scope_id",
+]);
+
+function legacyMigrationFailure(code, message, options = {}) {
+  throw new StatefulRelayError(code, message, options);
+}
+
+function readAuthoritativeLegacyTaskLineage(database, task) {
+  const events = database.prepare(`
+    SELECT event_id, task_id, revision, actor, type, body, created_at,
+           body_sha256, previous_event_sha256, event_sha256
+    FROM events
+    WHERE task_id = ?
+    ORDER BY revision ASC
+  `).all(task.task_id);
+  if (
+    events.length === 0 ||
+    events.length !== Number(task.current_revision) ||
+    events[0].revision !== 1 ||
+    events[0].type !== "TASK" ||
+    events[0].actor !== "GPT" ||
+    events[0].event_id !== task.original_task_event_id
+  ) {
+    legacyMigrationFailure(
+      "RELAY_LEGACY_MIGRATION_LINEAGE_INVALID",
+      "legacy task has no authoritative TASK lineage",
+    );
   }
-  if (!columns.has("claim_owner")) {
-    database.exec("ALTER TABLE tasks ADD COLUMN claim_owner TEXT");
+  let previousEventSha256 = null;
+  for (let index = 0; index < events.length; index += 1) {
+    const event = events[index];
+    const bodySha256 = sha256(event.body);
+    const eventSha256 = canonicalEventHash({
+      eventId: event.event_id,
+      taskId: event.task_id,
+      revision: Number(event.revision),
+      actor: event.actor,
+      type: event.type,
+      body: event.body,
+      createdAt: event.created_at,
+      bodySha256,
+      previousEventSha256,
+    });
+    if (
+      Number(event.revision) !== index + 1 ||
+      event.body_sha256 !== bodySha256 ||
+      event.previous_event_sha256 !== previousEventSha256 ||
+      event.event_sha256 !== eventSha256
+    ) {
+      legacyMigrationFailure(
+        "RELAY_LEGACY_MIGRATION_LINEAGE_INVALID",
+        "legacy task event lineage is not authoritative",
+      );
+    }
+    previousEventSha256 = event.event_sha256;
   }
-  if (!columns.has("claim_generation")) {
-    database.exec("ALTER TABLE tasks ADD COLUMN claim_generation INTEGER NOT NULL DEFAULT 0");
+  if (task.last_event_sha256 !== previousEventSha256) {
+    legacyMigrationFailure(
+      "RELAY_LEGACY_MIGRATION_LINEAGE_INVALID",
+      "legacy task head does not match its event lineage",
+    );
   }
-  if (!columns.has("claim_expires_at")) {
-    database.exec("ALTER TABLE tasks ADD COLUMN claim_expires_at TEXT");
+  return Object.freeze({ taskEvent: events[0], events: Object.freeze(events) });
+}
+
+function validateLegacyBoundedTaskBinding(task, lineage, rawCapability) {
+  let capability;
+  try {
+    capability = normalizeCapabilityRow(rawCapability);
+  } catch (error) {
+    legacyMigrationFailure(
+      "RELAY_LEGACY_MIGRATION_CAPABILITY_CONFLICT",
+      "legacy bounded-write capability contract is invalid",
+      { cause: error },
+    );
   }
-  const legacyClaims = database.prepare(`
-    SELECT task_id, claimed_at
+  const taskEvent = lineage.taskEvent;
+  let envelope;
+  try {
+    envelope = JSON.parse(taskEvent.body);
+  } catch (error) {
+    legacyMigrationFailure(
+      "RELAY_LEGACY_MIGRATION_CAPABILITY_CONFLICT",
+      "legacy bounded-write TASK envelope is invalid",
+      { cause: error },
+    );
+  }
+  const envelopeKeys = envelope && typeof envelope === "object" && !Array.isArray(envelope)
+    ? Object.keys(envelope).sort()
+    : [];
+  if (
+    JSON.stringify(envelopeKeys) !== JSON.stringify(LEGACY_BOUNDED_TASK_ENVELOPE_KEYS) ||
+    task.project_id !== STATEFUL_RELAY_CAPABILITY_PROJECT_ID ||
+    capability.project_id !== task.project_id ||
+    capability.task_id !== task.task_id ||
+    capability.client_request_id !== task.client_request_id ||
+    capability.request_sha256 !== taskEvent.body_sha256 ||
+    envelope.protocol !== "stateful-relay-bounded-write/v1" ||
+    envelope.operation !== capability.operation ||
+    envelope.request_id !== capability.client_request_id ||
+    envelope.target_scope_id !== capability.target_scope_id ||
+    envelope.payload_manifest_sha256 !== capability.payload_manifest_sha256 ||
+    !["stateful_skill_install_v1", "disposable_fixture_v1"].includes(envelope.execution_profile)
+  ) {
+    legacyMigrationFailure(
+      "RELAY_LEGACY_MIGRATION_CAPABILITY_CONFLICT",
+      "legacy bounded-write task and capability identities do not correlate",
+    );
+  }
+  if (
+    capability.state === STATEFUL_RELAY_CAPABILITY_STATE_CONSUMED &&
+    (capability.consumed_by !== task.claim_owner ||
+      capability.consumed_claim_generation !== Number(task.claim_generation))
+  ) {
+    legacyMigrationFailure(
+      "RELAY_LEGACY_MIGRATION_CAPABILITY_CONFLICT",
+      "legacy capability consumption does not match the durable task claim",
+    );
+  }
+  return capability;
+}
+
+function migrateLegacyExecutionModes(database) {
+  const tasks = database.prepare(`
+    SELECT task_id, project_id, execution_mode, state, current_revision,
+           original_task_event_id, last_event_sha256, client_request_id,
+           claim_owner, claim_generation
     FROM tasks
-    WHERE claim_owner IS NOT NULL
-      AND claimed_at IS NOT NULL
-      AND claim_generation = 0
+    ORDER BY task_id ASC
   `).all();
-  const backfillClaim = database.prepare(`
-    UPDATE tasks
-    SET claim_generation = 1, claim_expires_at = ?
-    WHERE task_id = ? AND claim_generation = 0
-  `);
-  for (const legacyClaim of legacyClaims) {
-    backfillClaim.run(leaseExpiryIso(legacyClaim.claimed_at), legacyClaim.task_id);
+  const taskIds = new Set(tasks.map(({ task_id: taskId }) => taskId));
+  const capabilitiesByTask = new Map();
+  const capabilities = database.prepare(`
+    SELECT *
+    FROM stateful_relay_capability_instances
+    ORDER BY task_id ASC, capability_id ASC
+  `).all();
+  for (const capability of capabilities) {
+    if (!taskIds.has(capability.task_id)) {
+      legacyMigrationFailure(
+        "RELAY_LEGACY_MIGRATION_ORPHAN_CAPABILITY",
+        "legacy capability has no bound Relay task",
+      );
+    }
+    const bound = capabilitiesByTask.get(capability.task_id) ?? [];
+    bound.push(capability);
+    capabilitiesByTask.set(capability.task_id, bound);
   }
-  database.exec(`
-    CREATE UNIQUE INDEX IF NOT EXISTS tasks_client_request_id_unique_idx
-      ON tasks(client_request_id)
-      WHERE client_request_id IS NOT NULL;
-    CREATE TRIGGER IF NOT EXISTS task_client_request_id_immutable_update
-    BEFORE UPDATE OF client_request_id ON tasks
-    BEGIN
-      SELECT RAISE(ABORT, 'RELAY_TASK_IDENTITY_IMMUTABLE');
-    END;
-  `);
+
+  const updateExecutionMode = database.prepare(
+    "UPDATE tasks SET execution_mode = ? WHERE task_id = ?",
+  );
+  for (const task of tasks) {
+    const lineage = readAuthoritativeLegacyTaskLineage(database, task);
+    const boundCapabilities = capabilitiesByTask.get(task.task_id) ?? [];
+    if (boundCapabilities.length > 1) {
+      legacyMigrationFailure(
+        "RELAY_LEGACY_MIGRATION_DUPLICATE_CAPABILITY",
+        "legacy task has more than one capability binding",
+      );
+    }
+    let expectedMode;
+    if (boundCapabilities.length === 1) {
+      validateLegacyBoundedTaskBinding(task, lineage, boundCapabilities[0]);
+      expectedMode = "bounded_write";
+    } else {
+      if (task.project_id === STATEFUL_RELAY_CAPABILITY_PROJECT_ID) {
+        legacyMigrationFailure(
+          "RELAY_LEGACY_MIGRATION_AUTHORITY_MISSING",
+          "reserved bounded-write project has no authoritative capability binding",
+        );
+      }
+      expectedMode = "read_only";
+    }
+
+    if (expectedMode === "bounded_write") {
+      updateExecutionMode.run(expectedMode, task.task_id);
+    }
+  }
+}
+
+function ensureManualDispatchColumns(database) {
+  database.exec("BEGIN IMMEDIATE");
+  try {
+    const columns = new Set(
+      database.prepare("PRAGMA table_info(tasks)").all().map((column) => column.name),
+    );
+    if (!columns.has("client_request_id")) {
+      database.exec("ALTER TABLE tasks ADD COLUMN client_request_id TEXT");
+    }
+    const executionModeAdded = !columns.has("execution_mode");
+    if (executionModeAdded) {
+      database.exec("ALTER TABLE tasks ADD COLUMN execution_mode TEXT NOT NULL DEFAULT 'read_only'");
+    }
+    if (!columns.has("claim_owner")) {
+      database.exec("ALTER TABLE tasks ADD COLUMN claim_owner TEXT");
+    }
+    if (!columns.has("claim_generation")) {
+      database.exec("ALTER TABLE tasks ADD COLUMN claim_generation INTEGER NOT NULL DEFAULT 0");
+    }
+    if (!columns.has("claim_expires_at")) {
+      database.exec("ALTER TABLE tasks ADD COLUMN claim_expires_at TEXT");
+    }
+    if (executionModeAdded) {
+      migrateLegacyExecutionModes(database);
+    }
+    const legacyClaims = database.prepare(`
+      SELECT task_id, claimed_at
+      FROM tasks
+      WHERE claim_owner IS NOT NULL
+        AND claimed_at IS NOT NULL
+        AND claim_generation = 0
+    `).all();
+    const backfillClaim = database.prepare(`
+      UPDATE tasks
+      SET claim_generation = 1, claim_expires_at = ?
+      WHERE task_id = ? AND claim_generation = 0
+    `);
+    for (const legacyClaim of legacyClaims) {
+      backfillClaim.run(leaseExpiryIso(legacyClaim.claimed_at), legacyClaim.task_id);
+    }
+    database.exec(`
+      CREATE UNIQUE INDEX IF NOT EXISTS tasks_client_request_id_unique_idx
+        ON tasks(client_request_id)
+        WHERE client_request_id IS NOT NULL;
+      CREATE TRIGGER IF NOT EXISTS task_client_request_id_immutable_update
+      BEFORE UPDATE OF client_request_id ON tasks
+      BEGIN
+        SELECT RAISE(ABORT, 'RELAY_TASK_IDENTITY_IMMUTABLE');
+      END;
+      CREATE TRIGGER IF NOT EXISTS task_execution_mode_immutable_update
+      BEFORE UPDATE OF execution_mode ON tasks
+      BEGIN
+        SELECT RAISE(ABORT, 'RELAY_TASK_IDENTITY_IMMUTABLE');
+      END;
+    `);
+    database.exec("COMMIT");
+  } catch (error) {
+    database.exec("ROLLBACK");
+    throw error;
+  }
 }
 
 export async function openStatefulRelayStore(databasePath, options = {}) {
@@ -2532,9 +2964,15 @@ export async function openStatefulRelayStore(databasePath, options = {}) {
     await mkdir(path.dirname(databasePath), { recursive: true });
   }
   const database = new DatabaseSync(databasePath);
-  database.exec(SCHEMA);
-  ensureManualDispatchColumns(database);
-  return new StatefulRelayStore(database, options);
+  try {
+    database.exec(SCHEMA);
+    ensureStatefulRelayWakeDeliverySchema(database, { now: options.now });
+    ensureManualDispatchColumns(database);
+    return new StatefulRelayStore(database, options);
+  } catch (error) {
+    database.close();
+    throw error;
+  }
 }
 
 export function createStatefulRelayApi(store) {

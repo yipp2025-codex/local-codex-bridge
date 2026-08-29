@@ -143,10 +143,13 @@ test("Native Skill installer performs one exact atomic create-only install and r
       assert.deepEqual(resultBody.correlation, {
         task_id: sent.task_id,
         project_id: BOUNDED_WRITE_PROJECT_ID,
+        execution_mode: "bounded_write",
         client_request_id: "native-skill-installer-e2e",
         task_body_sha256: sent.task_body_sha256,
         request_sha256: sent.request_sha256,
         result_revision: 4,
+        claim_owner: "CODEX",
+        claim_generation: 1,
         operation: BOUNDED_WRITE_OPERATION,
         target_scope_id: BOUNDED_WRITE_TARGET_SCOPE_ID,
       });

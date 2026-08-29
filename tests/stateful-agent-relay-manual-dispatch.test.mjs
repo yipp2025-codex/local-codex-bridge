@@ -142,6 +142,7 @@ test("manual closed loop separates TASK_READY from read/claim and RESULT_READY f
       "claim_expires_at",
       "claim_generation",
       "claim_state",
+      "execution_mode",
       "project_id",
       "revision",
       "task_body",
@@ -149,6 +150,7 @@ test("manual closed loop separates TASK_READY from read/claim and RESULT_READY f
     ]);
     assert.equal(mail.task_id, sent.task_id);
     assert.equal(mail.project_id, "relay-fixture");
+    assert.equal(mail.execution_mode, "read_only");
     assert.equal(mail.task_body, TASK_BODY);
     assert.equal(mail.claim_state, "CLAIMED");
     assert.equal(mail.revision, 2);
@@ -171,8 +173,10 @@ test("manual closed loop separates TASK_READY from read/claim and RESULT_READY f
 
     const result = api.check_results({}, GPT_AUTH);
     assert.deepEqual(receiptKeys(result), [
+      "execution_mode",
       "project_id",
       "result_body",
+      "result_correlation",
       "revision",
       "status",
       "task_id",
@@ -180,8 +184,20 @@ test("manual closed loop separates TASK_READY from read/claim and RESULT_READY f
     assert.deepEqual(result, {
       task_id: mail.task_id,
       project_id: "relay-fixture",
+      execution_mode: "read_only",
       status: "completed",
       result_body: RESULT_BODY,
+      result_correlation: {
+        task_id: mail.task_id,
+        project_id: "relay-fixture",
+        execution_mode: "read_only",
+        client_request_id: null,
+        task_body_sha256: result.result_correlation.task_body_sha256,
+        request_sha256: result.result_correlation.request_sha256,
+        result_revision: 3,
+        claim_owner: "manual-codex-a",
+        claim_generation: 1,
+      },
       revision: 3,
     });
     assert.deepEqual(api.check_results({}, GPT_AUTH), { status: "EMPTY" });

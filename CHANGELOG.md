@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.0.0-stateful-relay.3 — 2026-08-29
+
+- Add deployment-owned four-project read-only dispatch with durable project and
+  execution-mode identity, exact result correlation, and fail-closed legacy
+  migration.
+- Add exact `TASK_READY` wake correlation and a one-task Native read-only
+  consumer contract that never selects historical work by oldest-task order.
+- Add a deployment-pinned read-only Codex executor that sends task content over
+  stdin, keeps it out of argv, and records bounded process lifecycle evidence.
+- Finalize the common read-only Codex invocation with repository-preflight
+  compatibility, fixed owner-profile authentication, and a deployment-private
+  JSONL plus `output-last-message` dual-output contract.
+- Add a Windows deployment sink restricted to the fixed
+  `StatefulRelay-NativeWakeup` on-demand Scheduler task.
+- Add Streamable HTTP method compatibility, durable wake recovery/resume and
+  pre-claim reconciliation contracts, generic stale-runtime recovery, and
+  reboot-safe owner-scoped deployment boundaries.
+
 ## 1.0.0-stateful-relay.1
 
 - Add a durable Stateful Relay mailbox between GPT and a native Codex session.

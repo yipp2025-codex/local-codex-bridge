@@ -268,6 +268,7 @@ test("mixed recovery state is authoritative, deterministic, bounded, and restart
     const allowedItemKeys = [
       "claim_generation",
       "claim_owner",
+      "execution_mode",
       "lease_status",
       "next_actor",
       "notification_state",
