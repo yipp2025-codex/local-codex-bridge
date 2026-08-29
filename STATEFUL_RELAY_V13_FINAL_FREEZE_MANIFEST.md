@@ -8,11 +8,17 @@
 - Public backport base: `v1.0.0-stateful-relay.2`
 - Public backport base commit: `a821d99e600666fce1a070a85663d22430763ab0`
 - Frozen file count: `42`
-- Canonical inventory SHA-256: `041825ef932f1283d39840f63115941d03f0dbca11265435aa16f2f1dfabe8b7`
-- Canonical inventory format: UTF-8, paths bytewise sorted, one
+- Accepted candidate-byte inventory SHA-256: `041825ef932f1283d39840f63115941d03f0dbca11265435aa16f2f1dfabe8b7`
+- Canonical Git-blob inventory SHA-256: `a97f9de8f72c396b39d6e09e3c3d0615c5a9cfd0bab2d0373e32c715ac2b3a84`
+- Inventory format: UTF-8, paths bytewise sorted, one
   `relative_path<TAB>size_bytes<TAB>sha256<LF>` record per frozen file.
 - This manifest is excluded from the canonical inventory to avoid recursive
   hashing. Its own size and SHA-256 are reported with the release result.
+
+The per-file rows below identify the accepted deployment/candidate bytes,
+including their validated Windows line endings. The Git-blob aggregate binds
+the same 42 paths after Git text normalization so candidate and public commits
+remain reproducible across checkout line-ending policies.
 
 This is a sanitized source and deployment-generic freeze record. It contains no
 machine SID, personal absolute path, process ID, private Tunnel identity,
