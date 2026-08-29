@@ -20,9 +20,11 @@
 - Claim leases and generation fencing prevent stale consumers from submitting
   results after recovery.
 - RESULT delivery and GPT REVIEW are separate states.
-- The MCP/Relay process does not auto-start a consumer, retry execution, or
-  perform automatic review. A separately started native consumer may poll the
-  mailbox only while its deployment-owned process is explicitly running.
+- The MCP/Relay process does not directly spawn Codex, retry execution, or
+  perform automatic review. An optional deployment-owned wake sink may request
+  one fixed on-demand Scheduler task after durable `TASK_READY` commit. That
+  one-shot path must revalidate exact correlation, processes at most one task,
+  and has no oldest-task polling fallback.
 
 ## Data handling
 

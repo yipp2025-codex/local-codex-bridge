@@ -121,6 +121,12 @@ function validateTaskInput(input) {
   if (typeof input.task_body !== "string" || input.task_body.length === 0) {
     throw new ManualDispatchError("MANUAL_DISPATCH_INPUT_INVALID", "task_body is required");
   }
+  if (input.execution_mode !== undefined && input.execution_mode !== "read_only") {
+    throw new ManualDispatchError(
+      "MANUAL_DISPATCH_INPUT_INVALID",
+      "execution_mode must be read_only",
+    );
+  }
   if (input.task_body.length > 16 * 1024) {
     throw new ManualDispatchError("MANUAL_DISPATCH_INPUT_INVALID", "task_body is too large");
   }
@@ -609,12 +615,13 @@ export function createManualDispatchApi({
       assertAuth("GPT", auth, expectedCapabilities);
       const input = assertExactObject(
         args,
-        ["project_id", "task_body", "client_request_id"],
+        ["project_id", "execution_mode", "task_body", "client_request_id"],
         "MANUAL_DISPATCH_INPUT_INVALID",
       );
       validateTaskInput(input);
       const task = store.createTask({
         projectId: input.project_id,
+        executionMode: input.execution_mode ?? "read_only",
         body: input.task_body,
         clientRequestId: input.client_request_id,
       });
@@ -658,6 +665,7 @@ export function createManualDispatchApi({
         return {
           task_id: claimed.task.task_id,
           project_id: claimed.task.project_id,
+          execution_mode: claimed.task.execution_mode,
           task_body: taskBody,
           revision: claimed.task.current_revision,
           claim_state: claimed.task.state,
@@ -681,6 +689,7 @@ export function createManualDispatchApi({
       return {
         task_id: reclaimed.task.task_id,
         project_id: reclaimed.task.project_id,
+        execution_mode: reclaimed.task.execution_mode,
         task_body: taskBodyFromRead(reclaimed),
         revision: reclaimed.task.current_revision,
         claim_state: reclaimed.task.state,
@@ -738,6 +747,7 @@ export function createManualDispatchApi({
       return {
         task_id: read.task.task_id,
         project_id: read.task.project_id,
+        execution_mode: read.task.execution_mode,
         status: result.status,
         result_body: result.execution_summary,
         revision: read.task.current_revision,
@@ -753,7 +763,7 @@ export function createManualDispatchApi({
         ...(boundedWriteTask && Array.isArray(result.changed_files)
           ? { changed_files: result.changed_files }
           : {}),
-        ...(result.correlation ? { result_correlation: result.correlation } : {}),
+        result_correlation: result.correlation,
         ...(result.scope_evidence ? { scope_evidence: result.scope_evidence } : {}),
         ...(result.target_scope_projection
           ? { target_scope_projection: result.target_scope_projection }

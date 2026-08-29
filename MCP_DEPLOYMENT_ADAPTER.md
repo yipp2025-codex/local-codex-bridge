@@ -16,20 +16,22 @@ dispatch_bounded_write
 results
 ```
 
-`dispatch` is deliberately narrower than a direct Codex execution tool. It
-accepts only:
+`dispatch` is deliberately narrower than a direct Codex execution tool. In the
+V1.3 release it accepts only:
 
-- `project_id: "classroom"`
+- `project_id`: `classroom`, `investment`, `exam`, or `second_brain`
 - `execution_mode: "read_only"`
 - a bounded `task_body`
 - an optional bounded `client_request_id`
 
-The adapter maps the trusted `classroom` alias to the deployment-owned Relay
-project ID. Callers cannot provide a filesystem path, `cwd`, command, shell,
-process, environment, credential, or session parameter. `dispatch` creates a
-durable Relay task; it does not start Codex. A separately configured native
-Codex consumer claims the task and submits a result, which GPT receives through
-`results`.
+The adapter authorizes the logical ID through a deployment-owned execution
+registry. The separately configured native consumer maps that durable ID to a
+deployment-owned physical root. `bridge` is read-only and is never dispatchable.
+Callers cannot provide a filesystem path, `cwd`, command, shell, process,
+environment, project mapping, credential, or session parameter. `dispatch`
+creates a durable Relay task; it does not start Codex. A separately configured
+native Codex consumer claims the task and submits a project- and claim-fenced
+result, which GPT receives through `results`.
 
 `dispatch_bounded_write` is a separately gated surface for one frozen operation
 only:
@@ -57,6 +59,7 @@ STATEFUL_RELAY_DATABASE_PATH=<absolute deployment-local SQLite path>
 STATEFUL_RELAY_GPT_CAPABILITY=<64 lowercase hexadecimal characters>
 STATEFUL_RELAY_CODEX_CAPABILITY=<64 lowercase hexadecimal characters>
 STATEFUL_RELAY_CODEX_CONSUMER_ID=stateful-relay-codex
+STATEFUL_RELAY_EXECUTION_REGISTRY_PATH=<absolute deployment-owned V1.3 registry JSON path>
 STATEFUL_RELAY_CLASSROOM_PROJECT_ID=classroom
 STATEFUL_RELAY_BOUNDED_WRITE_ENABLED=false
 STATEFUL_RELAY_BOUNDED_WRITE_CAPABILITY=<64 lowercase hexadecimal characters when enabled>
@@ -66,6 +69,11 @@ STATEFUL_RELAY_BOUNDED_WRITE_INSTALLER_MODE=stateful_skill_v1
 MCP_PORT=<port or 0 for an ephemeral test port>
 ```
 
+`STATEFUL_RELAY_CLASSROOM_PROJECT_ID` is a legacy single-project fallback used
+only when no V1.3 execution registry is configured. The V1.3 registry document
+contains logical IDs, enablement, and allowed modes only; it contains no
+physical roots. See `deployment/stateful-relay-v13-execution-registry.example.json`.
+
 The deployment root must already be a physical canonical directory. The
 operation owns the leaf name and may create that leaf during the later
 installation gate; no caller input can replace either mapping component.
@@ -73,6 +81,9 @@ installation gate; no caller input can replace either mapping component.
 Copy the deployment-owned project roots into `project-allowlist.json`. The
 checked-in `project-allowlist.example.json` is intentionally empty. Physical
 roots remain deployment-local and are never returned by the read tools.
+The native consumer must bind the same four logical IDs to canonical roots in
+its deployment-owned trusted project registry. A missing, disabled, unknown, or
+ID/root-mismatched mapping fails before claim.
 
 The adapter package contains no Codex launcher and has no Relay-spawn execution
 path. The native Codex consumer, trusted runtime executor, and any process

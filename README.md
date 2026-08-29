@@ -1,6 +1,6 @@
-# GPT–Codex Stateful Relay V1
+# GPT–Codex Stateful Relay V1.3
 
-Candidate version: `v1.0.0-stateful-relay.1`
+Release version: `v1.0.0-stateful-relay.3`
 
 ## What it is
 
@@ -69,8 +69,11 @@ deployment and never resolve caller input directly to a filesystem path.
 The public MCP entry point is `mcp-server.mjs`. It retains the five bounded
 project read tools and exposes read-only `dispatch`, the separately gated
 `dispatch_bounded_write`, and `results` for the Stateful Relay operator.
-`dispatch` is fixed to the trusted `classroom` alias and the `read_only`
-execution mode. `dispatch_bounded_write` accepts only the frozen Stateful Relay
+V1.3 bounds `dispatch` to `classroom`, `investment`, `exam`, and
+`second_brain`, with `execution_mode=read_only`; `bridge` remains read-only and
+cannot dispatch. Logical enablement comes from a deployment-owned execution
+registry, while physical roots remain in the native consumer's trusted mapping.
+`dispatch_bounded_write` accepts only the frozen Stateful Relay
 Orchestrator Skill v1 installation operation; its project, target scope, and
 trusted Skill root and fixed Skill leaf are server-side fixed, and callers cannot pass paths,
 `cwd`, commands, shells, processes, or arbitrary prompts. Both dispatch paths
@@ -110,20 +113,21 @@ payload; it does not add a write capability.
 - The read-only Bridge has no project-write primitive.
 - Operator calls do not accept arbitrary paths, executables, shells,
   environments, credentials, or claim authority.
-- The MCP/Relay process does not auto-start a consumer, watcher, or review;
-  the separately started native mailbox consumer may poll only while explicitly
-  running.
+- The MCP/Relay process does not directly spawn Codex. A deployment-owned,
+  on-demand one-shot launcher may start the fixed Native read-only executor only
+  after an exact durable wake correlation; it processes at most one task and
+  never reviews, dispatches, or polls for unrelated work.
 - Local credentials, runtime state, machine hashes, and disposable databases
   are deployment-local and are not public source content.
 
 ## Known limitations
 
-- Manual deployment startup is still required; the native mailbox consumer is
-  not auto-started by MCP.
-- There is no push notification or automatic review.
-- Production integration is not enabled by default.
+- Windows Auto-start and Native wakeup require separate owner-scoped deployment
+  configuration and are not installed merely by installing this package.
+- There is no automatic review.
 - Git/worktree deployment depends on the owner execution context.
-- Codex must operate in its own normal trusted execution environment.
+- Native execution requires a deployment-pinned official Codex runtime and a
+  fixed owner authentication authority.
 - This V1 is not a fully autonomous agent loop.
 - The Relay-spawn execution path is deprecated and is not part of Stateful
   Relay V1.

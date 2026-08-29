@@ -55,6 +55,16 @@ test("Lifecycle B: continuous bounded activity avoids idle timeout", () => {
   assert.ok(tracker.lifecycle.stdout_bytes > 0);
 });
 
+test("Lifecycle B2: current JSONL response events remain non-sensitive lifecycle evidence", () => {
+  const tracker = createLifecycleTracker();
+  tracker.markSpawn("2026-01-01T00:00:00.000Z");
+  tracker.recordOutput("stdout", '{"type":"response.in_progress"}\n', "2026-01-01T00:00:00.010Z");
+  tracker.recordOutput("stdout", '{"type":"response.completed","response":{"status":"completed","output":[]}}\n', "2026-01-01T00:00:00.020Z");
+  tracker.flush();
+  assert.deepEqual(tracker.lifecycle.event_types, ["task_activity", "completion"]);
+  assert.equal(tracker.lifecycle.event_count, 2);
+});
+
 test("Lifecycle C: idle hang selects idle timeout", () => {
   assert.equal(evaluateCompletionWindow({
     nowMs: 8_000,
@@ -186,5 +196,57 @@ test("Lifecycle H: runtime identity and lifecycle evidence remain bounded in res
     assert.equal(body.runtime_identity.identity_status, "verified");
     assert.equal(body.execution_lifecycle.event_count, 2);
     assert.equal(result.integrity.valid, true);
+  });
+});
+
+test("Lifecycle I: native outcome classifications survive durable result normalization", async () => {
+  await withStore(async (store) => {
+    store.createTask({ taskId: "lifecycle-observability", projectId: "relay-fixture", body: TASK_BODY });
+    const consumer = createStatefulRelayConsumer({
+      store,
+      projectRegistry: createTrustedProjectRegistry({ "relay-fixture": process.cwd() }),
+      executeCodex: async () => {
+        const error = new Error("fixed executor failure");
+        error.code = "RELAY_NATIVE_EXECUTION_FAILED";
+        error.result = {
+          status: "failed",
+          changed_files: [],
+          execution_summary: null,
+          failure_classification: "NATIVE_CODEX_OUTPUT_CONTRACT_FAILED",
+          execution_lifecycle: {
+            executor_stage: "CODEX_EXECUTION",
+            exit_classification: "CODEX_EXIT_0",
+            parser_classification: "FINAL_AGENT_MESSAGE_ABSENT",
+            jsonl_lifecycle_classification: "JSONL_LIFECYCLE_VALID",
+            jsonl_final_message_count: 0,
+            output_last_message_classification: "OUTPUT_LAST_MESSAGE_ABSENT",
+            authoritative_final_message_source: null,
+            stderr_classification: "STDERR_PRESENT",
+            timed_out: false,
+            failure_classification: "NATIVE_CODEX_OUTPUT_CONTRACT_FAILED",
+            final_message_count: 0,
+            structured_output_record_count: 1,
+            malformed_output_record_count: 0,
+          },
+          error: { code: error.code, message: error.message },
+        };
+        throw error;
+      },
+    });
+    const result = await consumer.processNext();
+    const body = JSON.parse(result.events.at(-1).body);
+    assert.equal(result.task.state, "FAILED");
+    assert.equal(body.failure_classification, "NATIVE_CODEX_OUTPUT_CONTRACT_FAILED");
+    assert.equal(body.execution_lifecycle.executor_stage, "CODEX_EXECUTION");
+    assert.equal(body.execution_lifecycle.exit_classification, "CODEX_EXIT_0");
+    assert.equal(body.execution_lifecycle.parser_classification, "FINAL_AGENT_MESSAGE_ABSENT");
+    assert.equal(body.execution_lifecycle.jsonl_lifecycle_classification, "JSONL_LIFECYCLE_VALID");
+    assert.equal(body.execution_lifecycle.jsonl_final_message_count, 0);
+    assert.equal(body.execution_lifecycle.output_last_message_classification, "OUTPUT_LAST_MESSAGE_ABSENT");
+    assert.equal(body.execution_lifecycle.authoritative_final_message_source, null);
+    assert.equal(body.execution_lifecycle.stderr_classification, "STDERR_PRESENT");
+    assert.equal(body.execution_lifecycle.timed_out, false);
+    assert.equal(body.execution_lifecycle.final_message_count, 0);
+    assert.equal(body.execution_lifecycle.structured_output_record_count, 1);
   });
 });

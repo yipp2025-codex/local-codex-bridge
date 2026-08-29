@@ -10,6 +10,7 @@ import {
   statefulRelayToolNames,
   STATEFUL_RELAY_MCP_VERSION,
 } from "./stateful-relay-mcp-adapter.mjs";
+import { createWindowsStatefulRelayWakeupSink } from "./deployment/windows-stateful-relay-native-wakeup-sink.mjs";
 import {
   handleProjectTool,
   ProjectToolError,
@@ -62,13 +63,14 @@ export const toolDefinitions = Object.freeze([
   ...statefulRelayToolDefinitions,
 ]);
 
-function writeJson(response, statusCode, payload) {
+function writeJson(response, statusCode, payload, extraHeaders = {}) {
   const body = JSON.stringify(payload);
   response.writeHead(statusCode, {
     "Content-Type": "application/json; charset=utf-8",
     "Content-Length": Buffer.byteLength(body),
     "Cache-Control": "no-store",
     "X-Content-Type-Options": "nosniff",
+    ...extraHeaders,
   });
   response.end(body);
 }
@@ -159,7 +161,7 @@ export async function handleRpc(
           version: STATEFUL_RELAY_MCP_VERSION,
         },
         instructions:
-          "The public surface is bounded to list_allowed_projects, list_project_files, search_project, read_project_file, dispatch, dispatch_bounded_write, and results. dispatch requires project_id=classroom and execution_mode=read_only. dispatch_bounded_write exposes only the frozen Stateful Relay Orchestrator Skill v1 operation and remains disabled unless a deployment-owned write capability and target scope are configured. No unrestricted Codex prompt, session, shell, command, process, or arbitrary filesystem-write capability is exposed.",
+          "The public surface is bounded to list_allowed_projects, list_project_files, search_project, read_project_file, dispatch, dispatch_bounded_write, and results. dispatch accepts only classroom, investment, exam, or second_brain with execution_mode=read_only and resolves physical roots only through deployment-owned mappings; bridge is read-only and cannot dispatch. dispatch_bounded_write exposes only the frozen Stateful Relay Orchestrator Skill v1 operation and remains disabled unless a deployment-owned write capability and target scope are configured. No unrestricted Codex prompt, session, shell, command, process, environment, caller mapping, or arbitrary filesystem-write capability is exposed.",
       }),
     };
   }
@@ -274,7 +276,12 @@ export function createMcpServer({ projectAllowlist, operator } = {}) {
     }
 
     if (request.method !== "POST") {
-      writeJson(response, 405, { error: "method_not_allowed" });
+      writeJson(
+        response,
+        405,
+        { error: "method_not_allowed" },
+        { Allow: "POST" },
+      );
       return;
     }
 
@@ -342,7 +349,11 @@ function installShutdownHandlers(server, closeDeployment) {
 }
 
 async function startConfiguredMcpServer() {
-  const deployment = await openStatefulRelayDeployment();
+  const spoolDirectory = process.env.STATEFUL_RELAY_WAKEUP_SPOOL_DIRECTORY;
+  const wakeupSignalSink = spoolDirectory === undefined
+    ? null
+    : createWindowsStatefulRelayWakeupSink({ spool_directory: spoolDirectory });
+  const deployment = await openStatefulRelayDeployment({ wakeupSignalSink });
   const server = startMcpServer({ operator: deployment.operator });
   installShutdownHandlers(server, deployment.close);
 }

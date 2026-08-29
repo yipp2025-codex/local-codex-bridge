@@ -1,0 +1,25 @@
+{
+  "version": "stateful-relay-execution-registry/v1",
+  "projects": [
+    {
+      "project_id": "classroom",
+      "enabled": true,
+      "allowed_execution_modes": ["read_only"]
+    },
+    {
+      "project_id": "investment",
+      "enabled": true,
+      "allowed_execution_modes": ["read_only"]
+    },
+    {
+      "project_id": "exam",
+      "enabled": true,
+      "allowed_execution_modes": ["read_only"]
+    },
+    {
+      "project_id": "second_brain",
+      "enabled": true,
+      "allowed_execution_modes": ["read_only"]
+    }
+  ]
+}

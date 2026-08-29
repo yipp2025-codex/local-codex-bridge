@@ -1,4 +1,5 @@
 import path from "node:path";
+import { readFile } from "node:fs/promises";
 
 import {
   BOUNDED_WRITE_OPERATION,
@@ -30,9 +31,21 @@ import {
   createOperatorApi,
   OperatorUxError,
 } from "./stateful-agent-relay-operator.mjs";
+import {
+  createTrustedExecutionRegistry,
+  STATEFUL_RELAY_DISPATCH_PROJECT_IDS,
+  STATEFUL_RELAY_READ_ONLY_EXECUTION_MODE,
+  StatefulRelayExecutionRegistryError,
+} from "./stateful-relay-execution-registry.mjs";
+import { createStatefulRelayWakeSignal } from "./stateful-relay-native-wakeup.mjs";
+import {
+  markStatefulRelayWakeNormalDeliveryFailed,
+  markStatefulRelayWakeNormalDeliveryRequested,
+} from "./stateful-relay-wake-delivery.mjs";
 
 export const STATEFUL_RELAY_MCP_VERSION = "1.0.0-stateful-relay.1";
 export const STATEFUL_RELAY_MCP_PROJECT_ALIAS = "classroom";
+export const STATEFUL_RELAY_MCP_PROJECT_ALIASES = STATEFUL_RELAY_DISPATCH_PROJECT_IDS;
 export const STATEFUL_RELAY_MCP_TOOL_NAMES = Object.freeze([
   "dispatch",
   "dispatch_bounded_write",
@@ -59,14 +72,14 @@ const dispatchTool = Object.freeze({
   name: "dispatch",
   title: "Dispatch read-only Codex task",
   description:
-    "Queue one bounded read-only task for the fixed trusted classroom project alias. This creates a Relay task for the separately configured Codex consumer; it does not accept a filesystem path, cwd, command, shell, or process instruction as an execution parameter.",
+    "Queue one bounded read-only task for a deployment-enabled trusted project. This creates a Relay task for the separately configured Codex consumer; it does not accept a filesystem path, cwd, command, shell, process, environment, or project mapping as an execution parameter.",
   inputSchema: {
     type: "object",
     properties: {
       project_id: {
         type: "string",
-        const: STATEFUL_RELAY_MCP_PROJECT_ALIAS,
-        description: "Fixed trusted project alias; filesystem paths are not accepted.",
+        enum: STATEFUL_RELAY_DISPATCH_PROJECT_IDS,
+        description: "Bounded trusted project enum; bridge, unknown IDs, and filesystem paths are rejected.",
       },
       execution_mode: {
         type: "string",
@@ -95,7 +108,7 @@ const dispatchTool = Object.freeze({
       task_id: { type: "string", maxLength: 128 },
       project_alias: {
         type: "string",
-        const: STATEFUL_RELAY_MCP_PROJECT_ALIAS,
+        enum: STATEFUL_RELAY_DISPATCH_PROJECT_IDS,
       },
       project_id: { type: "string", maxLength: 64 },
       state: { type: "string", maxLength: 64 },
@@ -289,9 +302,10 @@ const resultsTool = Object.freeze({
       task_id: { type: "string", maxLength: 128 },
       project_alias: {
         type: "string",
-        const: STATEFUL_RELAY_MCP_PROJECT_ALIAS,
+        maxLength: 64,
       },
       project_id: { type: "string", maxLength: 64 },
+      execution_mode: { type: "string", enum: ["read_only", "bounded_write"] },
       result_body: { type: "string", maxLength: MAX_RESULT_BODY_CHARS },
       revision: { type: "integer", minimum: 1 },
       payload_manifest_sha256: { type: ["string", "null"], pattern: "^[a-f0-9]{64}$" },
@@ -316,10 +330,13 @@ const resultsTool = Object.freeze({
         properties: {
           task_id: { type: "string", maxLength: 128 },
           project_id: { type: "string", maxLength: 64 },
+          execution_mode: { type: "string", enum: ["read_only", "bounded_write"] },
           client_request_id: { type: ["string", "null"], maxLength: 128 },
           task_body_sha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
           request_sha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
           result_revision: { type: "integer", minimum: 1 },
+          claim_owner: { type: "string", maxLength: 128 },
+          claim_generation: { type: "integer", minimum: 1 },
           operation: { type: "string", maxLength: 128 },
           target_scope_id: { type: "string", maxLength: 128 },
         },
@@ -503,10 +520,10 @@ function normalizeDispatchInput(args) {
     ["project_id", "execution_mode", "task_body", "client_request_id"],
     "MCP_DISPATCH_INPUT_INVALID",
   );
-  if (input.project_id !== STATEFUL_RELAY_MCP_PROJECT_ALIAS) {
+  if (!STATEFUL_RELAY_DISPATCH_PROJECT_IDS.includes(input.project_id)) {
     throw new StatefulRelayMcpError(
       "MCP_DISPATCH_PROJECT_FORBIDDEN",
-      "dispatch is restricted to the trusted classroom project alias",
+      "dispatch project_id is not in the bounded V1.3 project enum",
     );
   }
   if (input.execution_mode !== "read_only") {
@@ -542,7 +559,8 @@ function normalizeDispatchInput(args) {
   }
 
   return {
-    project_id: STATEFUL_RELAY_MCP_PROJECT_ALIAS,
+    project_id: input.project_id,
+    execution_mode: STATEFUL_RELAY_READ_ONLY_EXECUTION_MODE,
     task_body: taskBody,
     ...(input.client_request_id === undefined
       ? {}
@@ -679,15 +697,33 @@ function requireConsumerId(value) {
   return value;
 }
 
+function requireExecutionRegistry(value) {
+  if (
+    !value ||
+    typeof value.authorize !== "function" ||
+    typeof value.aliases !== "function" ||
+    typeof value.snapshot !== "function"
+  ) {
+    throw new StatefulRelayMcpError(
+      "MCP_DEPLOYMENT_CONFIG_INVALID",
+      "trusted execution registry is invalid",
+      -32603,
+    );
+  }
+  return value;
+}
+
 export function createStatefulRelayOperator({
   store,
   gptCapability,
   codexCapability,
   codexConsumerId = "stateful-relay-codex",
   classroomProjectId = STATEFUL_RELAY_MCP_PROJECT_ALIAS,
+  executionRegistry = null,
   boundedWriteEnabled = false,
   boundedWriteCapability,
   boundedWriteTrustedSkillRoot,
+  wakeupSignalSink = null,
 } = {}) {
   if (!store) {
     throw new StatefulRelayMcpError(
@@ -697,7 +733,21 @@ export function createStatefulRelayOperator({
     );
   }
 
+  if (wakeupSignalSink !== null && typeof wakeupSignalSink !== "function") {
+    throw new StatefulRelayMcpError(
+      "MCP_DEPLOYMENT_CONFIG_INVALID",
+      "deployment wakeup signal sink is invalid",
+      -32603,
+    );
+  }
   const trustedProjectId = requireProjectId(classroomProjectId);
+  const trustedExecutionRegistry = requireExecutionRegistry(
+    executionRegistry ?? createTrustedExecutionRegistry([{
+      project_id: trustedProjectId,
+      enabled: true,
+      allowed_execution_modes: [STATEFUL_RELAY_READ_ONLY_EXECUTION_MODE],
+    }]),
+  );
   const trustedConsumerId = requireConsumerId(codexConsumerId);
   const trustedGptCapability = requireCapability(gptCapability, "GPT capability");
   const trustedCodexCapability = requireCapability(codexCapability, "Codex capability");
@@ -710,9 +760,7 @@ export function createStatefulRelayOperator({
 
   const operator = createOperatorApi({
     manualDispatch,
-    projectAliases: {
-      [STATEFUL_RELAY_MCP_PROJECT_ALIAS]: trustedProjectId,
-    },
+    projectAliases: trustedExecutionRegistry.aliases(),
     gptAuth: {
       actor: "GPT",
       capability: gptCapability,
@@ -729,8 +777,52 @@ export function createStatefulRelayOperator({
     writeCapability: boundedWriteCapability,
     trustedSkillRoot: boundedWriteTrustedSkillRoot,
   });
+  const dispatchReadOnly = (args) => {
+    const result = operator.dispatch(args);
+    if (wakeupSignalSink === null) return result;
+    const notification = store.listUnacknowledgedNotifications({
+      targetActor: "CODEX",
+      limit: 64,
+    }).find(({ task_id: taskId, type }) => taskId === result.task_id && type === "TASK_READY");
+    if (!notification) {
+      throw new StatefulRelayMcpError(
+        "MCP_WAKEUP_NOTIFICATION_MISSING",
+        "durable TASK_READY notification is missing",
+        -32603,
+      );
+    }
+    const signal = createStatefulRelayWakeSignal({
+      store,
+      notificationId: notification.notification_id,
+    });
+    try {
+      const emitted = wakeupSignalSink(signal);
+      if (emitted && typeof emitted.then === "function") {
+        throw new TypeError("wakeup signal sink must be synchronous");
+      }
+      markStatefulRelayWakeNormalDeliveryRequested(store.database, {
+        notificationId: notification.notification_id,
+      });
+    } catch (error) {
+      try {
+        markStatefulRelayWakeNormalDeliveryFailed(store.database, {
+          notificationId: notification.notification_id,
+        });
+      } catch {
+        // Preserve the original bounded wake delivery failure.
+      }
+      throw new StatefulRelayMcpError(
+        "MCP_WAKEUP_SIGNAL_FAILED",
+        "durable task remains ready because the bounded wake signal failed",
+        -32603,
+        { cause: error },
+      );
+    }
+    return result;
+  };
   return Object.freeze({
     ...operator,
+    dispatch: dispatchReadOnly,
     dispatch_bounded_write: (args) => boundedWrite.dispatch(args),
   });
 }
@@ -763,6 +855,51 @@ function requireDatabasePath(value) {
   return value;
 }
 
+async function readTrustedExecutionRegistry(registryPath) {
+  if (registryPath === undefined || registryPath === null) {
+    return null;
+  }
+  if (typeof registryPath !== "string" || !path.isAbsolute(registryPath)) {
+    throw new StatefulRelayMcpError(
+      "MCP_DEPLOYMENT_CONFIG_INVALID",
+      "STATEFUL_RELAY_EXECUTION_REGISTRY_PATH must be an absolute deployment-owned path",
+      -32603,
+    );
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(await readFile(registryPath, "utf8"));
+  } catch (error) {
+    throw new StatefulRelayMcpError(
+      "MCP_DEPLOYMENT_CONFIG_INVALID",
+      "trusted execution registry cannot be read",
+      -32603,
+      { cause: error },
+    );
+  }
+  if (
+    !parsed ||
+    typeof parsed !== "object" ||
+    Array.isArray(parsed) ||
+    Object.keys(parsed).sort().join("|") !== "projects|version" ||
+    parsed.version !== "stateful-relay-execution-registry/v1"
+  ) {
+    throw new StatefulRelayMcpError(
+      "MCP_DEPLOYMENT_CONFIG_INVALID",
+      "trusted execution registry document is invalid",
+      -32603,
+    );
+  }
+  try {
+    return createTrustedExecutionRegistry(parsed.projects);
+  } catch (error) {
+    if (error instanceof StatefulRelayExecutionRegistryError) {
+      throw new StatefulRelayMcpError(error.code, error.message, -32603, { cause: error });
+    }
+    throw error;
+  }
+}
+
 export async function openStatefulRelayDeployment({
   databasePath = process.env.STATEFUL_RELAY_DATABASE_PATH,
   gptCapability = process.env.STATEFUL_RELAY_GPT_CAPABILITY,
@@ -772,6 +909,7 @@ export async function openStatefulRelayDeployment({
   classroomProjectId =
     process.env.STATEFUL_RELAY_CLASSROOM_PROJECT_ID ??
     STATEFUL_RELAY_MCP_PROJECT_ALIAS,
+  executionRegistryPath = process.env.STATEFUL_RELAY_EXECUTION_REGISTRY_PATH,
   boundedWriteEnabled = parseBoundedWriteEnabled(
     process.env.STATEFUL_RELAY_BOUNDED_WRITE_ENABLED,
   ),
@@ -780,8 +918,10 @@ export async function openStatefulRelayDeployment({
     process.env.STATEFUL_RELAY_BOUNDED_WRITE_TRUSTED_SKILL_ROOT,
   boundedWriteExecutionMode =
     process.env.STATEFUL_RELAY_BOUNDED_WRITE_EXECUTION_MODE,
+  wakeupSignalSink = null,
 } = {}) {
   const trustedDatabasePath = requireDatabasePath(databasePath);
+  const executionRegistry = await readTrustedExecutionRegistry(executionRegistryPath);
   if (boundedWriteEnabled === true) {
     try {
       await preflightBoundedWriteSkillRoot(boundedWriteTrustedSkillRoot);
@@ -810,9 +950,11 @@ export async function openStatefulRelayDeployment({
       codexCapability,
       codexConsumerId,
       classroomProjectId,
+      executionRegistry,
       boundedWriteEnabled,
       boundedWriteCapability,
       boundedWriteTrustedSkillRoot,
+      wakeupSignalSink,
     });
     return Object.freeze({
       store,

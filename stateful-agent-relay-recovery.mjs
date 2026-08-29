@@ -129,6 +129,7 @@ function toInboxItem(task) {
   return {
     task_id: task.task_id,
     project_id: task.project_id,
+    execution_mode: task.execution_mode,
     state: task.state,
     revision: Number(task.current_revision),
     next_actor: action.next_actor,
@@ -210,9 +211,24 @@ export function createRecoveryUxApi(store) {
   return Object.freeze({
     relay_status() {
       const snapshot = store.getRecoverySnapshot();
+      const projectCounts = new Map();
+      for (const task of snapshot.tasks) {
+        const key = `${task.project_id}\u0000${task.execution_mode}`;
+        projectCounts.set(key, (projectCounts.get(key) ?? 0) + 1);
+      }
       return {
         status: "OK",
         ...snapshot.counts,
+        projects: Object.freeze([...projectCounts.entries()]
+          .map(([key, taskCount]) => {
+            const [projectId, executionMode] = key.split("\u0000");
+            return Object.freeze({
+              project_id: projectId,
+              execution_mode: executionMode,
+              task_count: taskCount,
+            });
+          })
+          .sort((left, right) => left.project_id.localeCompare(right.project_id))),
         summary: statusSummary(snapshot.counts),
       };
     },

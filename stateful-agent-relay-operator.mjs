@@ -275,7 +275,7 @@ export function createOperatorApi({
   function dispatch(args) {
     const input = assertExactObject(
       args,
-      ["project_id", "task_body", "client_request_id"],
+      ["project_id", "execution_mode", "task_body", "client_request_id"],
     );
     if (input.project_id === undefined || input.project_id === null || input.project_id === "") {
       throw new OperatorUxError(
@@ -292,9 +292,16 @@ export function createOperatorApi({
       );
     }
     const taskBody = normalizeTaskBody(input.task_body);
+    if (input.execution_mode !== undefined && input.execution_mode !== "read_only") {
+      throw new OperatorUxError(
+        "OPERATOR_EXECUTION_MODE_FORBIDDEN",
+        "only read_only execution is allowed",
+      );
+    }
     const clientRequestId = normalizeClientRequestId(input.client_request_id);
     const result = manualDispatch.send_task({
       project_id: projectId,
+      execution_mode: "read_only",
       task_body: taskBody,
       ...(clientRequestId === undefined ? {} : { client_request_id: clientRequestId }),
     }, trustedGptAuth);
@@ -303,6 +310,7 @@ export function createOperatorApi({
       task_id: result.task_id,
       project_alias: alias,
       project_id: projectId,
+      execution_mode: "read_only",
       state: result.state,
       task_body_sha256: sha256(taskBody),
       receipt: `DISPATCHED task=${result.task_id} project=${alias}`,
@@ -323,6 +331,7 @@ export function createOperatorApi({
       status: result.status,
       task_id: result.task_id,
       project_id: result.project_id,
+      execution_mode: result.execution_mode,
       ...(alias === null ? {} : { project_alias: alias }),
       result_body: result.result_body,
       revision: result.revision,
@@ -385,11 +394,14 @@ export function createOperatorApi({
     currentTask = Object.freeze({
       task_id: result.task_id,
       claim_generation: result.claim_generation,
+      project_id: result.project_id,
+      execution_mode: result.execution_mode,
     });
     return {
       status: "TASK",
       task_id: result.task_id,
       project_id: result.project_id,
+      execution_mode: result.execution_mode,
       task_body: result.task_body,
       claim_generation: result.claim_generation,
       receipt: `CLAIMED task=${result.task_id} generation=${result.claim_generation}`,

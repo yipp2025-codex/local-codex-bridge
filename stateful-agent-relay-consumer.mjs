@@ -33,9 +33,34 @@ export class StatefulRelayConsumerError extends Error {
  * The map is trusted server-side configuration. It is deliberately not stored
  * in the relay task or event body and is never accepted from the task caller.
  */
-export function createTrustedProjectRegistry(projects = {}) {
-  const entries = Object.entries(projects).map(([projectId, projectRoot]) => {
+export function createTrustedProjectRegistry(projects = {}, { executionRegistry = null } = {}) {
+  if (
+    executionRegistry !== null &&
+    (typeof executionRegistry !== "object" || typeof executionRegistry.authorize !== "function")
+  ) {
+    throw new StatefulRelayConsumerError(
+      "RELAY_TRUSTED_PROJECT_CONFIG_INVALID",
+      "trusted execution registry is invalid",
+    );
+  }
+  const entries = Object.entries(projects).map(([projectId, configuredValue]) => {
     validateProjectId(projectId);
+    let projectRoot = configuredValue;
+    if (configuredValue !== null && typeof configuredValue === "object" && !Array.isArray(configuredValue)) {
+      const keys = Object.keys(configuredValue).sort();
+      if (
+        keys.length !== 2 ||
+        keys[0] !== "project_id" ||
+        keys[1] !== "root" ||
+        configuredValue.project_id !== projectId
+      ) {
+        throw new StatefulRelayConsumerError(
+          "RELAY_PROJECT_ROOT_IDENTITY_MISMATCH",
+          "trusted project mapping identity does not match its project_id",
+        );
+      }
+      projectRoot = configuredValue.root;
+    }
     if (typeof projectRoot !== "string" || !path.isAbsolute(projectRoot)) {
       throw new StatefulRelayConsumerError(
         "RELAY_TRUSTED_PROJECT_CONFIG_INVALID",
@@ -47,8 +72,9 @@ export function createTrustedProjectRegistry(projects = {}) {
   const trustedProjects = new Map(entries);
 
   return Object.freeze({
-    async resolve(projectId) {
+    async resolve(projectId, executionMode = "read_only") {
       validateProjectId(projectId);
+      executionRegistry?.authorize(projectId, executionMode);
       const configuredRoot = trustedProjects.get(projectId);
       if (!configuredRoot) {
         throw new StatefulRelayConsumerError(
@@ -95,6 +121,7 @@ export function createTrustedProjectRegistry(projects = {}) {
       }
       return Object.freeze({
         project_id: projectId,
+        execution_mode: executionMode,
         root: canonicalRoot,
       });
     },
@@ -149,7 +176,10 @@ export function createStatefulRelayConsumer({ store, projectRegistry, executeCod
 
     // Resolve the project before claiming so an untrusted project id cannot
     // consume a Codex claim slot or trigger a hidden retry path.
-    const project = await projectRegistry.resolve(beforeClaim.task.project_id);
+    const project = await projectRegistry.resolve(
+      beforeClaim.task.project_id,
+      beforeClaim.task.execution_mode,
+    );
     const claimed = store.claimTask(taskId);
     store.updateState({
       taskId,
@@ -166,6 +196,7 @@ export function createStatefulRelayConsumer({ store, projectRegistry, executeCod
       executionResult = await executeCodex({
         task: running,
         project_id: running.task.project_id,
+        execution_mode: running.task.execution_mode,
         project_root: project.root,
       });
     } catch (error) {
@@ -174,7 +205,14 @@ export function createStatefulRelayConsumer({ store, projectRegistry, executeCod
     return store.appendResult({
       taskId,
       status: executionResult?.status === "completed" ? "completed" : "failed",
-      result: executionResult,
+      result: {
+        ...executionResult,
+        task_id: running.task.task_id,
+        project_id: running.task.project_id,
+        execution_mode: running.task.execution_mode,
+        claim_owner: "CODEX",
+        claim_generation: running.task.claim_generation,
+      },
       claimOwner: "CODEX",
       claimGeneration: running.task.claim_generation,
     });

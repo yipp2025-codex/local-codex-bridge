@@ -99,6 +99,16 @@ async function rpc(baseUrl, id, method, params) {
   };
 }
 
+async function httpRequest(baseUrl, requestPath, options = {}) {
+  const response = await fetch(`${baseUrl}${requestPath}`, options);
+  return {
+    status: response.status,
+    allow: response.headers.get("allow"),
+    contentType: response.headers.get("content-type"),
+    body: await response.text(),
+  };
+}
+
 test("Gate 1: initialize returns the Stateful Relay deployment identity", async () => {
   await withMcpServer(async (baseUrl) => {
     const reply = await rpc(baseUrl, 1, "initialize", {
@@ -133,7 +143,12 @@ test("Gate 2: tools/list retains read tools and exposes only bounded dispatch/re
       "execution_mode",
       "task_body",
     ]);
-    assert.equal(dispatch.inputSchema.properties.project_id.const, "classroom");
+    assert.deepEqual(dispatch.inputSchema.properties.project_id.enum, [
+      "classroom",
+      "investment",
+      "exam",
+      "second_brain",
+    ]);
     assert.equal(dispatch.inputSchema.properties.execution_mode.const, "read_only");
     assert.equal(dispatch.inputSchema.additionalProperties, false);
 
@@ -154,6 +169,48 @@ test("Gate 2: tools/list retains read tools and exposes only bounded dispatch/re
     const results = tools.find(({ name }) => name === "results");
     assert.equal(results.inputSchema.additionalProperties, false);
     assert.equal(results.annotations.openWorldHint, false);
+  });
+});
+
+test("Gate 2a: Streamable HTTP method contract is explicit and non-SSE", async () => {
+  await withMcpServer(async (baseUrl, calls) => {
+    const getMcp = await httpRequest(baseUrl, MCP_PATH, {
+      method: "GET",
+      headers: { accept: "text/event-stream" },
+    });
+    assert.equal(getMcp.status, 405);
+    assert.equal(getMcp.allow, "POST");
+    assert.match(getMcp.contentType ?? "", /^application\/json/u);
+    assert.deepEqual(JSON.parse(getMcp.body), { error: "method_not_allowed" });
+    assert.equal(calls.dispatchCalls, 0);
+    assert.equal(calls.boundedWriteCalls, 0);
+    assert.equal(calls.resultsCalls, 0);
+
+    const deleteMcp = await httpRequest(baseUrl, MCP_PATH, { method: "DELETE" });
+    assert.equal(deleteMcp.status, 405);
+    assert.equal(deleteMcp.allow, "POST");
+
+    const optionsMcp = await httpRequest(baseUrl, MCP_PATH, { method: "OPTIONS" });
+    assert.equal(optionsMcp.status, 204);
+    assert.equal(optionsMcp.allow, "POST, OPTIONS");
+    assert.equal(optionsMcp.body, "");
+  });
+});
+
+test("Gate 2b: legacy SSE, message, and unknown paths remain 404", async () => {
+  await withMcpServer(async (baseUrl, calls) => {
+    for (const requestPath of ["/sse", "/message", "/unknown"]) {
+      const response = await httpRequest(baseUrl, requestPath, {
+        method: requestPath === "/message" ? "POST" : "GET",
+        headers: { accept: "text/event-stream" },
+      });
+      assert.equal(response.status, 404, requestPath);
+      assert.equal(response.allow, null, requestPath);
+      assert.deepEqual(JSON.parse(response.body), { error: "not_found" });
+    }
+    assert.equal(calls.dispatchCalls, 0);
+    assert.equal(calls.boundedWriteCalls, 0);
+    assert.equal(calls.resultsCalls, 0);
   });
 });
 
