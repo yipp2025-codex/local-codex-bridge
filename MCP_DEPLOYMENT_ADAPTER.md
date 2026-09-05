@@ -150,3 +150,23 @@ is created by the enablement gate. A separate read-only
 `verifyFrozenStatefulRelaySkillReadback` verifier can re-scan the fixed leaf and
 compare its manifest and bytes to the frozen payload after `results`; it does
 not create a task or expose a write operation.
+
+## Maintenance availability and evidence
+
+The advertised transport has exactly eight tools: ping, list_allowed_projects,
+list_project_files, search_project, read_project_file, dispatch,
+dispatch_bounded_write, and results. Read-only dispatch accepts exactly the four
+fixed project IDs with execution_mode=read_only. Physical roots, runtime, cwd,
+commands and claimant context are never caller-owned execution parameters.
+Results delivers and acknowledges the next result; it is not a side-effect-free
+status query.
+
+The bounded-write tool remains advertised but owner-gated and is classified
+EXPERIMENTAL. Supervisor, dynamic Registry and local-operation tools are
+NOT_SHIPPED. Manual/library operations are not extra MCP endpoints. The MCP
+initialize version remains the existing stable contract identity; the package
+version is not changed for this untagged maintenance candidate.
+
+The historical accepted read-only round trip is reused only through exact
+source byte identity with the completed V1.3 golden freeze. No current service,
+new live canary, claimant cutover or Supervisor availability is inferred.

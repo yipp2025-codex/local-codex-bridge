@@ -1,57 +1,41 @@
-# Stateful Relay V1 Public Release Candidate Manifest
+# Stateful Relay V1.3 Public Maintenance Candidate
 
-candidate_version: `v1.0.0-stateful-relay.1`
-source_frozen_commit: `a6e7bedb27b8858432bb106d2c85e559992feaa7`
-source_frozen_tree: `e908c8f9fde81569e5449463d1df96a1e112d941`
-source_frozen_manifest_sha256: `623ec9fe6767e5ae0ba7ef42462a7ce769fea0a35f0481909f673daa3d429352`
-candidate_source: frozen_git_object_only
-manifest_scope: all release files below; this manifest is excluded to avoid recursive hashing
-file_count: 27
-candidate_tree_manifest_sha256: `11ffc55d02718d733089fe536cf9b176019efb748bfff7a3b8bad1f0c0c52a67`
-clean_install: npm ci PASS
-clean_room_tests: 78/78 PASS
-operator_smoke: PASS
-reliability_smoke: PASS
-official_mutation_count: 0
-production_integration: NONE
+Public baseline: v1.0.0-stateful-relay.3 at
+6acb07e43767d6e542589dc6ad8a32f1a298f6ab, target branch main.
 
-## Canonical file manifest
+Golden source: ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83, local annotated tag
+stateful-relay-v1.3-final-freeze.2. The source parent is the accepted V1.3 base,
+not the rejected V1.5 freeze. The package version remains unchanged pending
+a later owner release decision. No final public tag is created.
 
-Format: `relative_path<TAB>size_bytes<TAB>sha256<LF>`; paths are UTF-8 bytewise sorted.
+The canonical public file inventory, per-change classifications, explicit
+private exclusions, MCP availability and independent regression receipt are in
+[the maintenance manifest](deployment/stateful-relay-public-maintenance.manifest.json).
+[The golden source manifest](deployment/stateful-relay-v13-golden-source.manifest.json)
+binds the exact accepted execution closure. Public core bytes retain that identity.
 
-```text
-CHANGELOG.md	523	8fcdd4a2728ec215e4ad8629e60335d49d681b8da2c57513e410d8b0a35aa26f
-LICENSE	11358	cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30
-MIGRATION.md	631	1e446ce8975b0cb2ba382fa8c6dfa323f573ee79e101b527a1ddc8b656993c69
-NOTICE.md	312	6b39a3818842623f42ceeb887afff9b94b46291f32d0f27a3d0088f430d902a8
-PUBLIC_DEPENDENCY_MANIFEST.md	4410	a336276738f59538221f2e52093c7b7e7bf26f3377a35fbf33fc5d0449709b94
-README.md	2496	be809b6e28e459152a90af49f3ebd6834756c7470b2bf82ef187c5fc342372a8
-SECURITY_BOUNDARY.md	1331	8e98cb1010bd63856cd1c489ade65ef1db6553957652cc5ffa95ddf6eb70b96d
-USAGE.md	643	0ef2e0491ad3c91b77e6ca51451be51a5cb38ee25a7f9f3d5294ec7c0f432e2b
-native-agent-relay-consumer.mjs	6530	3d80c7aba4844a47e612bc25cbb2be81b53c3fe7d62d7fc33edc841fed74c927
-package-lock.json	292	a6b048c0c6411cd36bf0bb3475a2fedd000e52e57b3c611e869bc434fcb722a6
-package.json	865	975a92a10f4d0de42318bdc09ad5a994705d9c2790ccd9d27c9e30769c3bdaf6
-stateful-agent-relay-consumer.mjs	6409	899f08dae3212855e0294103e6702d327ca3c2403c90d3394c99b7a14f35c6dd
-stateful-agent-relay-lifecycle.mjs	7773	33abf53bf3690fa3e920676c9b0ea4d46b0706e5919d1d6fe2075e49e9530bbc
-stateful-agent-relay-manual-dispatch.mjs	12215	6c437fd65162a303c8b6e33b5af729911bfc8a61a0cffcced40249f9ac992c41
-stateful-agent-relay-notification.mjs	1307	e5361e6cb27f87c8cac3192b96e3a90cfe182f47c55d80c6785a308b2811ccfa
-stateful-agent-relay-operator.mjs	12725	4e63b866a0f3d9fa64d28006b1d53a0efd9d9de41ff31cebe8be2958412950d7
-stateful-agent-relay-recovery.mjs	7350	d96daa4ee77120d71f62e38002e7b149dcac9c07e416586e7f004881771dffa7
-stateful-agent-relay-store.mjs	43550	1131cba815439fc6dd99fd9e9b2dc7fa7d65b4836e92cde163d71adef3bfa914
-stateful-relay-result.schema.json	802	3a57ead5f1575fb52afbb3eb6f642ed0897e31168d491af717989d8aaf96fdbc
-tests/native-agent-relay-consumer.test.mjs	7721	b7da17185d80340754e2695b4f282affeb2770fe11f6f68696a4a516360b4394
-tests/stateful-agent-relay-lifecycle.test.mjs	7167	7e97398523b6019757d00f083e72e2b0899fe36002aaa2a9ab84fa0fdb8478d9
-tests/stateful-agent-relay-manual-dispatch.test.mjs	21554	7e9fb76f447f0fe8a7a086205e552ecf5afc1fc08dbb5737fa28c8ccaadf131a
-tests/stateful-agent-relay-notification.test.mjs	13156	f3d95f089b69392201af6eacb3de9b3257da8dce3f4ae187536baf8ea65ace09
-tests/stateful-agent-relay-operator.test.mjs	19807	a9554ef9947b8e132a2793102534dbc40bea8dbf8679e93c9685f7589f27caf7
-tests/stateful-agent-relay-recovery.test.mjs	15721	fc931dddcc102a25b5dd75570758f8b03129c35e99381eaa2d84f050667c9245
-tests/stateful-agent-relay-restart.test.mjs	6873	d42da69848ee0a10510f5c3a1bc9a0733d8f519e63ded44585b9ad049443391a
-tests/stateful-agent-relay.test.mjs	14151	c009e8fbcb03a259455ea570ee3fc566221d440f018d0ef354618df2dabe20ae
-```
+The historical single real bidirectional round trip is reused by exact source
+byte identity. No new live canary occurred. The scope is legacy_v13@epoch1 with
+one execution, a correct returned result, no test-attributable file mutation,
+and four older pending tasks unaffected. This observation is not a universal
+external-side-effect exactly-once guarantee.
 
-## Public boundary
+AVAILABLE: ping, four bounded project read tools, read-only dispatch, results,
+durable claim/result/wake/resume core, and a separately configured bounded
+Native executor. EXPERIMENTAL: the advertised but owner-gated bounded Skill
+write workflow. NOT_SHIPPED: Supervisor V1.5, dynamic Registry, local-operation
+extensions, and a V1.5 claimant implementation.
 
-The package contains relay state, notification, recovery, operator, consumer,
-schema, tests, and sanitized release documentation. Deployment-owned project
-aliases, active configuration, credentials, runtime identity, databases,
-logs, and local forensic evidence are excluded.
+Private activation/probe sources, credentials, owner/account mappings, runtime
+paths, physical root values, auth and CODEX_HOME state, live databases,
+task/result payloads and journals are excluded. The public tree uses generic
+configuration examples and includes no private fixture or sibling candidate
+dependency.
+
+This is a local candidate for owner review. No push or public tag is performed.
+
+Independent validation: 292 tests pass, zero failures and zero skips. The exact
+public source export was tested outside the project workspace with an empty
+Codex home. Source inventory, manifest integrity, private-dependency rejection
+and secret-leakage checks pass. The three Windows PowerShell source contracts
+retain the exact golden bytes that passed syntax parsing.

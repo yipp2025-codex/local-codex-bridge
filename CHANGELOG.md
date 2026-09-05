@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — accepted V1.3 golden baseline
+
+- Preserve exact source bytes from the accepted legacy claimant live round trip.
+- Select only durable eligible wake signals; keep recovery-held and previously claimed work untouched.
+- Consume a failed explicit resume generation once, including repeated failure classes.
+- Enforce legacy claimant identity, epoch and source-manifest fences at claim boundaries.
+- Bind the accepted Codex 0.153.4 binary to the existing bounded invocation profile and reject unsupported binaries before claiming.
+- Record historical live evidence separately from fresh isolated regression; no new live execution or Supervisor cutover occurred.
+
 ## 1.0.0-stateful-relay.3 — 2026-08-29
 
 - Add deployment-owned four-project read-only dispatch with durable project and

@@ -2,6 +2,8 @@ import { timingSafeEqual } from "node:crypto";
 
 import { StatefulRelayError } from "./stateful-agent-relay-store.mjs";
 
+import { STATEFUL_RELAY_LEGACY_CLAIMANT_ID } from "./stateful-relay-task-claimant-authority-v1.mjs";
+
 export const NATIVE_CODEX_CONSUMER_IDENTITY = Object.freeze({
   actor: "CODEX",
   mechanism: "local_capability",
@@ -75,7 +77,8 @@ function requireStore(store) {
   const methods = [
     "listReadyTasks",
     "readTask",
-    "claimTask",
+    "bindTaskClaimantSession",
+    "claimTaskForClaimant",
     "appendEvent",
     "appendResult",
     "updateState",
@@ -94,6 +97,9 @@ export function createAuthenticatedNativeConsumerApi({ store, expectedCapability
   requireStore(store);
   const authenticator = createNativeConsumerAuthenticator(expectedCapability);
   const authenticate = (capability) => authenticator.authenticate(capability);
+  const claimantContext = store.bindTaskClaimantSession(
+    STATEFUL_RELAY_LEGACY_CLAIMANT_ID,
+  );
 
   return Object.freeze({
     list_ready_tasks(args, capability) {
@@ -106,7 +112,11 @@ export function createAuthenticatedNativeConsumerApi({ store, expectedCapability
     },
     claim_task(taskId, capability) {
       authenticate(capability);
-      return store.claimTask(taskId, NATIVE_CLAIM_OWNER);
+      return store.claimTaskForClaimant({
+        taskId,
+        claimantContext,
+        claimOwner: NATIVE_CLAIM_OWNER,
+      });
     },
     append_event({ taskId, actor, type, body } = {}, capability) {
       authenticate(capability);

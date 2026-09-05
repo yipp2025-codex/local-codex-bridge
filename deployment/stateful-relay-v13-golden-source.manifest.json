@@ -1,0 +1,747 @@
+{
+  "schema_version": "stateful-relay-live-proven-golden-freeze/v1",
+  "logical_source_identity": "legacy_v13@epoch1",
+  "accepted_base_commit": "ad99154e45d13e29ff6d8eaa5011823e87b55163",
+  "source_closure_digest_format": "SHA256(UTF8 compact JSON with sorted object keys of source_files sorted by relative_path); exact source bytes including line endings.",
+  "accepted_configured_source_file_count": 27,
+  "accepted_configured_source_digest": "f9705b3a186846ef01bd2f204c849572ff4e3e6a76e2d79bfa053af0f95a6319",
+  "source_files": [
+    {
+      "relative_path": "deployment/deployment-owner-identity.ps1",
+      "size_bytes": 3998,
+      "sha256": "0b2fc798b7eddf3303636bb1c4bc61612c1ef8a985f1cc5765ef72bdee401d83"
+    },
+    {
+      "relative_path": "deployment/start-stateful-relay-native-wakeup-once.ps1",
+      "size_bytes": 2697,
+      "sha256": "2661699a880e1c38b8320dff0f49bd71784b80a8cd088ee6b99fe81b9d13b4a0"
+    },
+    {
+      "relative_path": "deployment/stateful-relay-native-wakeup-launcher-contract.ps1",
+      "size_bytes": 6610,
+      "sha256": "dfcaac4f45dd4d8dd9cb0b7afd786e856d10515a668267d1474bbc2b35df089d"
+    },
+    {
+      "relative_path": "deployment/stateful-relay-native-wakeup-once.mjs",
+      "size_bytes": 28153,
+      "sha256": "7f981a30b64ac29aaf2bb80f658382ffc2c27a345254d86ab119930a4a20cdd9"
+    },
+    {
+      "relative_path": "deployment/windows-stateful-relay-native-wakeup-sink.mjs",
+      "size_bytes": 9929,
+      "sha256": "f1f77143ab31eda95d19d61dfbbf111482b97c9384ae8cff0053e09c7e1d41e2"
+    },
+    {
+      "relative_path": "mcp-server.mjs",
+      "size_bytes": 10685,
+      "sha256": "d526ecc68068852b707073fd1c67919ada4721b531bcaa879d72667c4c62b4a5"
+    },
+    {
+      "relative_path": "native-agent-relay-consumer.mjs",
+      "size_bytes": 7051,
+      "sha256": "2fdbcf4f8376204665b2be8d04e9832c80328a2e8e8a4d0ba0775bebe79ab496"
+    },
+    {
+      "relative_path": "package.json",
+      "size_bytes": 1915,
+      "sha256": "895ca449d9e4451fd54a50db3fb0be476afca8c28e71457cf43d7b84621a5894"
+    },
+    {
+      "relative_path": "project-read-data-plane.mjs",
+      "size_bytes": 28312,
+      "sha256": "7d8923b03360f0a8b4e02811bb80e70b14b2b686d9b16f218c16ae551fa81583"
+    },
+    {
+      "relative_path": "skill-payload/stateful-relay-orchestrator/SKILL.md",
+      "size_bytes": 3035,
+      "sha256": "f4dd8ed7d5342e3808ef2038bc181e3dc0c083346c9302ac2bac3971092374b7"
+    },
+    {
+      "relative_path": "stateful-agent-relay-consumer.mjs",
+      "size_bytes": 8479,
+      "sha256": "dc9bfdc073910321f9c442f3d147827454d99e96f0f2809121dfbe64e3bf3346"
+    },
+    {
+      "relative_path": "stateful-agent-relay-lifecycle.mjs",
+      "size_bytes": 8324,
+      "sha256": "afec20a10cdf72731a9e698a96cad987b01887066da15b65231a3d061a04dfd0"
+    },
+    {
+      "relative_path": "stateful-agent-relay-manual-dispatch.mjs",
+      "size_bytes": 33585,
+      "sha256": "650c4afab1d7d44fb1a42d71ab821630039870f092e7a21afcc5daf63176831d"
+    },
+    {
+      "relative_path": "stateful-agent-relay-notification.mjs",
+      "size_bytes": 1353,
+      "sha256": "22c9d8cdcd9af02ae5ce6e1cee24bee386bc2ede7962c0a166e9177782596f89"
+    },
+    {
+      "relative_path": "stateful-agent-relay-operator.mjs",
+      "size_bytes": 14397,
+      "sha256": "66383350ff22b3e1c7c381b755d0028ec90b74c8ee8551174b221f74186134a6"
+    },
+    {
+      "relative_path": "stateful-agent-relay-recovery.mjs",
+      "size_bytes": 8279,
+      "sha256": "5dc9fcb609252181d36b2bc0a9ad13cd4e06d555b11b292625f618407f7bbff4"
+    },
+    {
+      "relative_path": "stateful-agent-relay-store.mjs",
+      "size_bytes": 109819,
+      "sha256": "bbc473f43a5e20a860ca55476bc03bf797d97278bcd7f05c5cd6d67f5f195576"
+    },
+    {
+      "relative_path": "stateful-relay-bounded-write-fixture.mjs",
+      "size_bytes": 2461,
+      "sha256": "e6be03870dc3846a3d6fe388293057fa70ce042baa09b1ed5ef25ed89ce04337"
+    },
+    {
+      "relative_path": "stateful-relay-bounded-write.mjs",
+      "size_bytes": 44891,
+      "sha256": "d986c6447e5b471289615bc0dd396768db7035d06dd574a3595904d1b3bac187"
+    },
+    {
+      "relative_path": "stateful-relay-capability.mjs",
+      "size_bytes": 855,
+      "sha256": "ae200bad3bdd7b4d41d63c47ccb7620ab11a68c4368cbf8937b300c1689d1926"
+    },
+    {
+      "relative_path": "stateful-relay-codex-invocation-profile-v1.mjs",
+      "size_bytes": 4295,
+      "sha256": "9001fe3f83f6cc423919de4b528f10140c1fa94db07e3b32fc68370bf5525d61"
+    },
+    {
+      "relative_path": "stateful-relay-execution-registry.mjs",
+      "size_bytes": 4798,
+      "sha256": "0a68c16a3d61f6c3d4601e3066566494928479da20400e6bfd016bfca9577588"
+    },
+    {
+      "relative_path": "stateful-relay-mcp-adapter.mjs",
+      "size_bytes": 32714,
+      "sha256": "459d3b7be3b007b4c667cbdf2805fbfd38b23cf7bfa416c96b52ae396ad27fd2"
+    },
+    {
+      "relative_path": "stateful-relay-native-mailbox-bounded-write.mjs",
+      "size_bytes": 22701,
+      "sha256": "1b7fbbf74df61defa391ccf30c0e2a191663017bf2400d7e290548fd131ea6b8"
+    },
+    {
+      "relative_path": "stateful-relay-native-readonly-executor.mjs",
+      "size_bytes": 29984,
+      "sha256": "76e1372955b985f7b4b3aca7db019a75c8b78df7e04f0a710825f625fc6e5a23"
+    },
+    {
+      "relative_path": "stateful-relay-native-wakeup.mjs",
+      "size_bytes": 11112,
+      "sha256": "8eeb1f45e650aca85e6fa4dc74165ce6ab1bf06488d33d45460de94e226a8561"
+    },
+    {
+      "relative_path": "stateful-relay-skill-payload.mjs",
+      "size_bytes": 4197,
+      "sha256": "e3ba2dfb0a09206b86ce45315ca7df7fe83e2dcdccb15fb793f393f0f30d3cf6"
+    },
+    {
+      "relative_path": "stateful-relay-task-claimant-authority-v1.mjs",
+      "size_bytes": 11871,
+      "sha256": "95cffdb16695b9893c58b9a96b16ee24de16e1c083114fadc41ceb35a0a611f2"
+    },
+    {
+      "relative_path": "stateful-relay-v13-legacy-claimant-manifest-v1.mjs",
+      "size_bytes": 2911,
+      "sha256": "39f51b9952377ccca82b9302e5212014c3e82cd4242f1d69706b94c3d969d47b"
+    },
+    {
+      "relative_path": "stateful-relay-wake-delivery.mjs",
+      "size_bytes": 52448,
+      "sha256": "32496fb0ae084ca69ca171cec42399c391ac3ac8454b44895d7f303edbb85d6b"
+    }
+  ],
+  "accepted_live_execution_file_count": 30,
+  "accepted_live_execution_closure_digest": "c70d1af7f2fbd2a3822a2781a016bf7fba082fe5227ce74566bd8a96385bcc49",
+  "reconstructed_live_execution_closure_digest": "c70d1af7f2fbd2a3822a2781a016bf7fba082fe5227ce74566bd8a96385bcc49",
+  "supporting_launcher_scope": "Adds the exact accepted zero-argument PowerShell launcher and two dot-sourced source contracts to the 27-file configured Node closure. No task registration, private configuration or credentials are included.",
+  "dynamic_entrypoint_modules": {
+    "wakeup": "stateful-relay-native-wakeup.mjs",
+    "executor": "stateful-relay-native-readonly-executor.mjs",
+    "invocation_profile": "stateful-relay-codex-invocation-profile-v1.mjs",
+    "sink": "deployment/windows-stateful-relay-native-wakeup-sink.mjs",
+    "consumer": "stateful-agent-relay-consumer.mjs",
+    "notification": "stateful-agent-relay-notification.mjs",
+    "registry": "stateful-relay-execution-registry.mjs",
+    "store": "stateful-agent-relay-store.mjs",
+    "wakeDelivery": "stateful-relay-wake-delivery.mjs"
+  },
+  "static_relative_import_edges": [
+    {
+      "from": "deployment/windows-stateful-relay-native-wakeup-sink.mjs",
+      "to": "stateful-relay-native-wakeup.mjs"
+    },
+    {
+      "from": "mcp-server.mjs",
+      "to": "deployment/windows-stateful-relay-native-wakeup-sink.mjs"
+    },
+    {
+      "from": "mcp-server.mjs",
+      "to": "project-read-data-plane.mjs"
+    },
+    {
+      "from": "mcp-server.mjs",
+      "to": "stateful-relay-mcp-adapter.mjs"
+    },
+    {
+      "from": "native-agent-relay-consumer.mjs",
+      "to": "stateful-agent-relay-store.mjs"
+    },
+    {
+      "from": "native-agent-relay-consumer.mjs",
+      "to": "stateful-relay-task-claimant-authority-v1.mjs"
+    },
+    {
+      "from": "stateful-agent-relay-consumer.mjs",
+      "to": "stateful-agent-relay-store.mjs"
+    },
+    {
+      "from": "stateful-agent-relay-consumer.mjs",
+      "to": "stateful-relay-task-claimant-authority-v1.mjs"
+    },
+    {
+      "from": "stateful-agent-relay-manual-dispatch.mjs",
+      "to": "stateful-agent-relay-recovery.mjs"
+    },
+    {
+      "from": "stateful-agent-relay-manual-dispatch.mjs",
+      "to": "stateful-agent-relay-store.mjs"
+    },
+    {
+      "from": "stateful-agent-relay-manual-dispatch.mjs",
+      "to": "stateful-relay-bounded-write.mjs"
+    },
+    {
+      "from": "stateful-agent-relay-manual-dispatch.mjs",
+      "to": "stateful-relay-capability.mjs"
+    },
+    {
+      "from": "stateful-agent-relay-manual-dispatch.mjs",
+      "to": "stateful-relay-task-claimant-authority-v1.mjs"
+    },
+    {
+      "from": "stateful-agent-relay-notification.mjs",
+      "to": "stateful-agent-relay-store.mjs"
+    },
+    {
+      "from": "stateful-agent-relay-recovery.mjs",
+      "to": "stateful-agent-relay-store.mjs"
+    },
+    {
+      "from": "stateful-agent-relay-store.mjs",
+      "to": "stateful-relay-capability.mjs"
+    },
+    {
+      "from": "stateful-agent-relay-store.mjs",
+      "to": "stateful-relay-skill-payload.mjs"
+    },
+    {
+      "from": "stateful-agent-relay-store.mjs",
+      "to": "stateful-relay-task-claimant-authority-v1.mjs"
+    },
+    {
+      "from": "stateful-agent-relay-store.mjs",
+      "to": "stateful-relay-wake-delivery.mjs"
+    },
+    {
+      "from": "stateful-relay-bounded-write.mjs",
+      "to": "stateful-agent-relay-consumer.mjs"
+    },
+    {
+      "from": "stateful-relay-bounded-write.mjs",
+      "to": "stateful-relay-capability.mjs"
+    },
+    {
+      "from": "stateful-relay-bounded-write.mjs",
+      "to": "stateful-relay-skill-payload.mjs"
+    },
+    {
+      "from": "stateful-relay-mcp-adapter.mjs",
+      "to": "stateful-agent-relay-manual-dispatch.mjs"
+    },
+    {
+      "from": "stateful-relay-mcp-adapter.mjs",
+      "to": "stateful-agent-relay-operator.mjs"
+    },
+    {
+      "from": "stateful-relay-mcp-adapter.mjs",
+      "to": "stateful-agent-relay-store.mjs"
+    },
+    {
+      "from": "stateful-relay-mcp-adapter.mjs",
+      "to": "stateful-relay-bounded-write.mjs"
+    },
+    {
+      "from": "stateful-relay-mcp-adapter.mjs",
+      "to": "stateful-relay-capability.mjs"
+    },
+    {
+      "from": "stateful-relay-mcp-adapter.mjs",
+      "to": "stateful-relay-execution-registry.mjs"
+    },
+    {
+      "from": "stateful-relay-mcp-adapter.mjs",
+      "to": "stateful-relay-native-mailbox-bounded-write.mjs"
+    },
+    {
+      "from": "stateful-relay-mcp-adapter.mjs",
+      "to": "stateful-relay-native-wakeup.mjs"
+    },
+    {
+      "from": "stateful-relay-mcp-adapter.mjs",
+      "to": "stateful-relay-skill-payload.mjs"
+    },
+    {
+      "from": "stateful-relay-mcp-adapter.mjs",
+      "to": "stateful-relay-wake-delivery.mjs"
+    },
+    {
+      "from": "stateful-relay-native-mailbox-bounded-write.mjs",
+      "to": "native-agent-relay-consumer.mjs"
+    },
+    {
+      "from": "stateful-relay-native-mailbox-bounded-write.mjs",
+      "to": "stateful-agent-relay-consumer.mjs"
+    },
+    {
+      "from": "stateful-relay-native-mailbox-bounded-write.mjs",
+      "to": "stateful-agent-relay-store.mjs"
+    },
+    {
+      "from": "stateful-relay-native-mailbox-bounded-write.mjs",
+      "to": "stateful-relay-bounded-write-fixture.mjs"
+    },
+    {
+      "from": "stateful-relay-native-mailbox-bounded-write.mjs",
+      "to": "stateful-relay-bounded-write.mjs"
+    },
+    {
+      "from": "stateful-relay-native-readonly-executor.mjs",
+      "to": "stateful-agent-relay-lifecycle.mjs"
+    },
+    {
+      "from": "stateful-relay-native-readonly-executor.mjs",
+      "to": "stateful-relay-codex-invocation-profile-v1.mjs"
+    },
+    {
+      "from": "stateful-relay-native-wakeup.mjs",
+      "to": "stateful-agent-relay-consumer.mjs"
+    },
+    {
+      "from": "stateful-relay-native-wakeup.mjs",
+      "to": "stateful-relay-execution-registry.mjs"
+    },
+    {
+      "from": "stateful-relay-native-wakeup.mjs",
+      "to": "stateful-relay-wake-delivery.mjs"
+    },
+    {
+      "from": "stateful-relay-task-claimant-authority-v1.mjs",
+      "to": "stateful-relay-v13-legacy-claimant-manifest-v1.mjs"
+    }
+  ],
+  "claimant_authority_manifest_digest": "9616914634d0fe7afc3a9b0f075d568ef26f77c88130272731dca71076f238b0",
+  "runtime": {
+    "version": "0.153.4",
+    "sha256": "a1cf6360ca71918d5466bc3a32d9f18b7044c9128756d1949e715d277b88c9b6",
+    "architecture": "x64",
+    "invocation_capability_digest": "fb8a237eab96d89b524b5382a6b564107c31270f5b2242aa2dc1c6b19fe5c3b7",
+    "signature_and_version_basis": "Exact binary hash matches the previously verified OpenAI-signed x64 generation; no rebind or new model invocation."
+  },
+  "live_acceptance": {
+    "LIVE_BIDIRECTIONAL_ROUND_TRIP": "PASS",
+    "LIVE_CLAIMANT": "legacy_v13@epoch1",
+    "LIVE_SOURCE_BYTE_EQUIVALENCE": "PASS",
+    "LIVE_EVIDENCE_REUSE": "PASS_EXACT_ACCEPTED_SOURCE_BYTE_IDENTITY",
+    "EXACTLY_ONCE_OBSERVED": true,
+    "PENDING_TASK_NONINTERFERENCE_OBSERVED": true,
+    "NEW_LIVE_CANARY_EXECUTED": false,
+    "SUPERVISOR_V15_CUTOVER": false,
+    "accepted_execution_date_utc": "2026-09-05",
+    "event_sequence": [
+      "TASK@1",
+      "CLAIM@2",
+      "STATE@3",
+      "RESULT@4"
+    ],
+    "original_pending_count": 4,
+    "accepted_claim_generation": 1,
+    "accepted_resume_generation": 0,
+    "formal_gpt_result_receipt_observed": true,
+    "test_attributable_file_mutation": false,
+    "scope": "Historical single real GPT to Relay to Native Codex to Relay result to GPT round trip, reused by exact source byte identity. No new live execution occurred in this freeze.",
+    "limitations": [
+      "No universal external-side-effect exactly-once guarantee.",
+      "No Supervisor, dynamic Registry, local-operation, restart-resume or concurrent-arrival live acceptance is attributed to this evidence."
+    ]
+  },
+  "evidence_provenance": {
+    "accepted_repair_record_sha256": "c9cc3453d06afbc81a414ae9cc85dc6642f13fa5313bc536f6af471f1a7d77b9",
+    "accepted_progress_record_sha256": "d4b2ca3ec2c76e8750d4f247621fd3c0da49f93b3bb291a795f2cc28a5dddb05",
+    "live_result_payloads_or_private_paths_copied": false
+  },
+  "source_classification": [
+    {
+      "source_relative_path": "deployment/stateful-relay-native-wakeup-once.mjs",
+      "category": "EXECUTION_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "7f981a30b64ac29aaf2bb80f658382ffc2c27a345254d86ab119930a4a20cdd9",
+      "disposition": "Exact accepted live source closure; all bytes retained."
+    },
+    {
+      "source_relative_path": "native-agent-relay-consumer.mjs",
+      "category": "EXECUTION_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "2fdbcf4f8376204665b2be8d04e9832c80328a2e8e8a4d0ba0775bebe79ab496",
+      "disposition": "Exact accepted live source closure; all bytes retained."
+    },
+    {
+      "source_relative_path": "stateful-agent-relay-consumer.mjs",
+      "category": "EXECUTION_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "dc9bfdc073910321f9c442f3d147827454d99e96f0f2809121dfbe64e3bf3346",
+      "disposition": "Exact accepted live source closure; all bytes retained."
+    },
+    {
+      "source_relative_path": "stateful-agent-relay-manual-dispatch.mjs",
+      "category": "EXECUTION_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "650c4afab1d7d44fb1a42d71ab821630039870f092e7a21afcc5daf63176831d",
+      "disposition": "Exact accepted live source closure; all bytes retained."
+    },
+    {
+      "source_relative_path": "stateful-agent-relay-store.mjs",
+      "category": "EXECUTION_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "bbc473f43a5e20a860ca55476bc03bf797d97278bcd7f05c5cd6d67f5f195576",
+      "disposition": "Exact accepted live source closure; all bytes retained."
+    },
+    {
+      "source_relative_path": "stateful-relay-native-readonly-executor.mjs",
+      "category": "EXECUTION_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "76e1372955b985f7b4b3aca7db019a75c8b78df7e04f0a710825f625fc6e5a23",
+      "disposition": "Exact accepted live source closure; all bytes retained."
+    },
+    {
+      "source_relative_path": "stateful-relay-wake-delivery.mjs",
+      "category": "EXECUTION_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "32496fb0ae084ca69ca171cec42399c391ac3ac8454b44895d7f303edbb85d6b",
+      "disposition": "Exact accepted live source closure; all bytes retained."
+    },
+    {
+      "source_relative_path": "tests/stateful-relay-legacy-migration.test.mjs",
+      "category": "TEST_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "803a3ce697b5d98c0d85333c02dcd9efa2b96a7ba316b777f904aa0828a69840",
+      "disposition": "Portable fixture coverage required by accepted claimant/runtime/wake behavior."
+    },
+    {
+      "source_relative_path": "tests/stateful-relay-native-readonly-executor.test.mjs",
+      "category": "TEST_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "4aef9ff6e2a160f99cb6b7faeb28fca1674b231e9c885b4e668f293e309cd666",
+      "disposition": "Portable fixture coverage required by accepted claimant/runtime/wake behavior."
+    },
+    {
+      "source_relative_path": "tests/stateful-relay-native-wakeup.test.mjs",
+      "category": "TEST_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "cf91a5bfb6a31dab602ac3813fec192f2e47c0cee30df224ccc545c4fc88d6be",
+      "disposition": "Portable fixture coverage required by accepted claimant/runtime/wake behavior."
+    },
+    {
+      "source_relative_path": "deployment/bootstrap-stateful-relay-v15c2a-legacy-claimant-once.mjs",
+      "category": "PRIVATE_RUNTIME_STATE",
+      "sha256": "e6d27ad7e7d12fc984b44ac12c332aa95bb466eec471dcad33cd4d89ed7e63b3",
+      "disposition": "Historical bootstrap, canary, or deployment state does not belong to reconstructed execution."
+    },
+    {
+      "source_relative_path": "deployment/probe-stateful-relay-native-post-login.mjs",
+      "category": "DOC_EVIDENCE_ONLY",
+      "sha256": "9d605cf74a3ee2a41f561995b7e07fa39c43bfa95a47c1c0f60bf916dbfb2275",
+      "disposition": "Retain only accepted source hashes and sanitized provenance; do not import machine activation/probe."
+    },
+    {
+      "source_relative_path": "deployment/run-stateful-relay-v15c2a-legacy-continuity-canary-once.mjs",
+      "category": "PRIVATE_RUNTIME_STATE",
+      "sha256": "e2a945caa4c975b52e50afa9d61e0005b16d43b18433707406bc38591ccb450e",
+      "disposition": "Historical bootstrap, canary, or deployment state does not belong to reconstructed execution."
+    },
+    {
+      "source_relative_path": "deployment/stateful-relay-native-post-login-repair.manifest.json",
+      "category": "DOC_EVIDENCE_ONLY",
+      "sha256": "36cfde2736a6d9f6b76c1f5c80c7b2901afc45a745d86e49516d2f01139a1615",
+      "disposition": "Retain only accepted source hashes and sanitized provenance; do not import machine activation/probe."
+    },
+    {
+      "source_relative_path": "deployment/stateful-relay-native-post-login.staged.json",
+      "category": "PRIVATE_RUNTIME_STATE",
+      "sha256": "2e78e4fa4eb7e029ce543aa18f502bd7f1b732f11879eeeaac1b35116d6efe1d",
+      "disposition": "Historical bootstrap, canary, or deployment state does not belong to reconstructed execution."
+    },
+    {
+      "source_relative_path": "stateful-relay-codex-invocation-profile-v1.mjs",
+      "category": "EXECUTION_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "9001fe3f83f6cc423919de4b528f10140c1fa94db07e3b32fc68370bf5525d61",
+      "disposition": "Exact accepted live source closure; all bytes retained."
+    },
+    {
+      "source_relative_path": "stateful-relay-task-claimant-authority-v1.mjs",
+      "category": "EXECUTION_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "95cffdb16695b9893c58b9a96b16ee24de16e1c083114fadc41ceb35a0a611f2",
+      "disposition": "Exact accepted live source closure; all bytes retained."
+    },
+    {
+      "source_relative_path": "stateful-relay-v13-legacy-claimant-manifest-v1.mjs",
+      "category": "EXECUTION_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "39f51b9952377ccca82b9302e5212014c3e82cd4242f1d69706b94c3d969d47b",
+      "disposition": "Exact accepted live source closure; all bytes retained."
+    },
+    {
+      "source_relative_path": "stateful-relay-v15c2a-legacy-bootstrap-v1.mjs",
+      "category": "PRIVATE_RUNTIME_STATE",
+      "sha256": "b2b7926da0ec62897236dbb06a6f9aff47af941466568672f8cd051ad07438d2",
+      "disposition": "Historical bootstrap, canary, or deployment state does not belong to reconstructed execution."
+    },
+    {
+      "source_relative_path": "tests/stateful-relay-native-post-login-repair.test.mjs",
+      "category": "TEST_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "b06324a4c34594bff76588a9e53c3083b6c97979527206bb9da3e90bf36bab4d",
+      "disposition": "Portable fixture coverage required by accepted claimant/runtime/wake behavior."
+    },
+    {
+      "source_relative_path": "tests/stateful-relay-v15c2a-codex-invocation-compatibility.test.mjs",
+      "category": "TEST_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "791b231ede5fb7a4f122ac034a13970b809e93a1c8548c502efab30f26f7d5f7",
+      "disposition": "Portable fixture coverage required by accepted claimant/runtime/wake behavior."
+    },
+    {
+      "source_relative_path": "tests/stateful-relay-v15c2a-legacy-claimant-authority.test.mjs",
+      "category": "TEST_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "74537d955629991e953658cb7b3204716701bd64792b4b3566b9f7316f31e73c",
+      "disposition": "Preserve portable source-identity, staged-authority, stale-epoch, claim/result, phantom and caller-rejection fixtures; replace private bootstrap and machine-path fixture dependencies with canonical fixture-only calls.",
+      "destination_relative_path": "tests/stateful-relay-legacy-claimant-authority.test.mjs"
+    },
+    {
+      "source_relative_path": "config/deployment-owner.env",
+      "category": "SECURITY_SENSITIVE",
+      "disposition": "Excluded; contents not read."
+    },
+    {
+      "source_relative_path": "runtime/",
+      "category": "PRIVATE_RUNTIME_STATE",
+      "disposition": "Excluded; no live database, task/result payload, journal, auth, or private root mapping copied."
+    },
+    {
+      "source_relative_path": "visualization audit output",
+      "category": "GENERATED_LOCAL_ONLY",
+      "disposition": "Excluded; canonical manifest is independently rebuilt from current accepted source bytes."
+    },
+    {
+      "source_relative_path": "V1.5 Supervisor candidate",
+      "category": "UNRELATED_DIRTY",
+      "disposition": "Preserved unchanged; no source or tests imported from candidate."
+    },
+    {
+      "source_relative_path": "accepted PROGRESS.md and repair provenance",
+      "category": "DOC_EVIDENCE_ONLY",
+      "disposition": "Read for attribution; only bounded non-secret acceptance statements and document hashes retained."
+    },
+    {
+      "source_relative_path": "deployment/start-stateful-relay-native-wakeup-once.ps1",
+      "category": "EXECUTION_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "2661699a880e1c38b8320dff0f49bd71784b80a8cd088ee6b99fe81b9d13b4a0",
+      "disposition": "Exact accepted zero-argument launcher and its two dot-sourced contracts; configuration/state excluded."
+    },
+    {
+      "source_relative_path": "deployment/stateful-relay-native-wakeup-launcher-contract.ps1",
+      "category": "EXECUTION_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "dfcaac4f45dd4d8dd9cb0b7afd786e856d10515a668267d1474bbc2b35df089d",
+      "disposition": "Exact accepted zero-argument launcher and its two dot-sourced contracts; configuration/state excluded."
+    },
+    {
+      "source_relative_path": "deployment/deployment-owner-identity.ps1",
+      "category": "EXECUTION_REQUIRED_ACCEPTED_CHANGE",
+      "sha256": "0b2fc798b7eddf3303636bb1c4bc61612c1ef8a985f1cc5765ef72bdee401d83",
+      "disposition": "Exact accepted zero-argument launcher and its two dot-sourced contracts; configuration/state excluded."
+    },
+    {
+      "source_relative_path": "tests/stateful-agent-relay-operator.test.mjs",
+      "category": "TEST_REQUIRED_ACCEPTED_CHANGE",
+      "disposition": "Replace a synthetic absolute-path example with a portable placeholder; preserve rejection coverage."
+    }
+  ],
+  "validation": {
+    "full_regression": {
+      "status": "PASS",
+      "tests": 289,
+      "suites": 0,
+      "pass": 289,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "isolated_empty_home": true,
+      "private_deployment_environment_removed": true
+    },
+    "powershell_parse": {
+      "status": "PASS",
+      "files": 3,
+      "source_executed": false
+    },
+    "secret_leakage": "PASS",
+    "exactly_once_claim_result_fences_phantom_wake_resume_pending_noninterference": "PASS_FIXTURE",
+    "runtime_01534_profile": "PASS"
+  },
+  "commit_binding": "The local annotated golden tag binds the completed commit, tree, patch SHA-256 and stable patch-id; this source manifest excludes itself from its source closure to avoid recursive hashing.",
+  "reconstruction_byte_classes": [
+    {
+      "relative_path": "deployment/deployment-owner-identity.ps1",
+      "classification": "ADDED_ACCEPTED_SOURCE",
+      "base_git_sha256": null
+    },
+    {
+      "relative_path": "deployment/start-stateful-relay-native-wakeup-once.ps1",
+      "classification": "ADDED_ACCEPTED_SOURCE",
+      "base_git_sha256": null
+    },
+    {
+      "relative_path": "deployment/stateful-relay-native-wakeup-launcher-contract.ps1",
+      "classification": "ADDED_ACCEPTED_SOURCE",
+      "base_git_sha256": null
+    },
+    {
+      "relative_path": "deployment/stateful-relay-native-wakeup-once.mjs",
+      "classification": "ACCEPTED_BEHAVIOR_CHANGE",
+      "base_git_sha256": "7e60a3c3d0f3c1fa9da1d514fe9899a7e008f19cc7667ee017b7e05677300f3b"
+    },
+    {
+      "relative_path": "deployment/windows-stateful-relay-native-wakeup-sink.mjs",
+      "classification": "BASE_BYTES_IDENTICAL",
+      "base_git_sha256": "f1f77143ab31eda95d19d61dfbbf111482b97c9384ae8cff0053e09c7e1d41e2"
+    },
+    {
+      "relative_path": "mcp-server.mjs",
+      "classification": "ACCEPTED_EOL_BYTES_REQUIRED",
+      "base_git_sha256": "715bcbb58962fdb171ac5686d6afd5c0953777330e1c17b8f7a561c3d42b8241"
+    },
+    {
+      "relative_path": "native-agent-relay-consumer.mjs",
+      "classification": "ACCEPTED_BEHAVIOR_CHANGE",
+      "base_git_sha256": "3d80c7aba4844a47e612bc25cbb2be81b53c3fe7d62d7fc33edc841fed74c927"
+    },
+    {
+      "relative_path": "package.json",
+      "classification": "ACCEPTED_EOL_BYTES_REQUIRED",
+      "base_git_sha256": "00a3d89f0b04cc757e2fc1cf333901e89565627eaa2f2267ff13eb15c4c92648"
+    },
+    {
+      "relative_path": "project-read-data-plane.mjs",
+      "classification": "ACCEPTED_EOL_BYTES_REQUIRED",
+      "base_git_sha256": "593a2126ce8644cc0fcedb75abd4e7fa572fe23df480d26ab0bb5074dca2d892"
+    },
+    {
+      "relative_path": "skill-payload/stateful-relay-orchestrator/SKILL.md",
+      "classification": "BASE_BYTES_IDENTICAL",
+      "base_git_sha256": "f4dd8ed7d5342e3808ef2038bc181e3dc0c083346c9302ac2bac3971092374b7"
+    },
+    {
+      "relative_path": "stateful-agent-relay-consumer.mjs",
+      "classification": "ACCEPTED_BEHAVIOR_CHANGE",
+      "base_git_sha256": "5596862e2880d282e313cc421b05844f025f8d10ea55cf31458152c588dabcf2"
+    },
+    {
+      "relative_path": "stateful-agent-relay-lifecycle.mjs",
+      "classification": "ACCEPTED_EOL_BYTES_REQUIRED",
+      "base_git_sha256": "c47e998ee377ecfd43f6c503822ab9adbe336af0bf60273b012791cbd6a023b1"
+    },
+    {
+      "relative_path": "stateful-agent-relay-manual-dispatch.mjs",
+      "classification": "ACCEPTED_BEHAVIOR_CHANGE",
+      "base_git_sha256": "e76b8e2d1b391416661c8d31a2830ff93f14f6c797beaa57ab64f50000606bdd"
+    },
+    {
+      "relative_path": "stateful-agent-relay-notification.mjs",
+      "classification": "ACCEPTED_EOL_BYTES_REQUIRED",
+      "base_git_sha256": "e5361e6cb27f87c8cac3192b96e3a90cfe182f47c55d80c6785a308b2811ccfa"
+    },
+    {
+      "relative_path": "stateful-agent-relay-operator.mjs",
+      "classification": "ACCEPTED_EOL_BYTES_REQUIRED",
+      "base_git_sha256": "2ec930ab7b6412ddb8ebf7a2e59ca2c0ce893ea137a413f42374ed68b680117a"
+    },
+    {
+      "relative_path": "stateful-agent-relay-recovery.mjs",
+      "classification": "ACCEPTED_EOL_BYTES_REQUIRED",
+      "base_git_sha256": "9789b8a2a51deef089bba788858db13f1aa46d51d41d25bb70e2b7fd267e177d"
+    },
+    {
+      "relative_path": "stateful-agent-relay-store.mjs",
+      "classification": "ACCEPTED_BEHAVIOR_CHANGE",
+      "base_git_sha256": "d34cb9bab19a9acf64c5462ac29e2788fdab506612531b60ba5a65b7e021d77c"
+    },
+    {
+      "relative_path": "stateful-relay-bounded-write-fixture.mjs",
+      "classification": "ACCEPTED_EOL_BYTES_REQUIRED",
+      "base_git_sha256": "6d05d6a791699159725de9381c748d98a9bd58b1d654d4f7a9fd93e03bdf8dd3"
+    },
+    {
+      "relative_path": "stateful-relay-bounded-write.mjs",
+      "classification": "ACCEPTED_EOL_BYTES_REQUIRED",
+      "base_git_sha256": "cb45db9abf68d824d64c782fa151cc6034d12c255aacd3f2ac63cd1cdd7100e8"
+    },
+    {
+      "relative_path": "stateful-relay-capability.mjs",
+      "classification": "ACCEPTED_EOL_BYTES_REQUIRED",
+      "base_git_sha256": "7c16c3ca5bf3407b3ef14a038c6b71ab03faa416f5198a2f46f6e56086cf9f4f"
+    },
+    {
+      "relative_path": "stateful-relay-codex-invocation-profile-v1.mjs",
+      "classification": "ADDED_ACCEPTED_SOURCE",
+      "base_git_sha256": null
+    },
+    {
+      "relative_path": "stateful-relay-execution-registry.mjs",
+      "classification": "BASE_BYTES_IDENTICAL",
+      "base_git_sha256": "0a68c16a3d61f6c3d4601e3066566494928479da20400e6bfd016bfca9577588"
+    },
+    {
+      "relative_path": "stateful-relay-mcp-adapter.mjs",
+      "classification": "ACCEPTED_EOL_BYTES_REQUIRED",
+      "base_git_sha256": "b4150f4de2d656ce0ae6a0bdf41d755d0be9fa13e6f68a095357c937d742f28c"
+    },
+    {
+      "relative_path": "stateful-relay-native-mailbox-bounded-write.mjs",
+      "classification": "ACCEPTED_EOL_BYTES_REQUIRED",
+      "base_git_sha256": "53f2c137a3b0e1791702447b4063d6b2c331cf08c701d8721cb6e227669c96be"
+    },
+    {
+      "relative_path": "stateful-relay-native-readonly-executor.mjs",
+      "classification": "ACCEPTED_BEHAVIOR_CHANGE",
+      "base_git_sha256": "953fd542a05670e0c259d4cfc8b921d4dd8fc8cba375f50d1bcf6ad79a9bafc0"
+    },
+    {
+      "relative_path": "stateful-relay-native-wakeup.mjs",
+      "classification": "BASE_BYTES_IDENTICAL",
+      "base_git_sha256": "8eeb1f45e650aca85e6fa4dc74165ce6ab1bf06488d33d45460de94e226a8561"
+    },
+    {
+      "relative_path": "stateful-relay-skill-payload.mjs",
+      "classification": "ACCEPTED_EOL_BYTES_REQUIRED",
+      "base_git_sha256": "7947aaae7ff0f143bfc61500d932edd1cb810580f26fb81557e37c8aa9953727"
+    },
+    {
+      "relative_path": "stateful-relay-task-claimant-authority-v1.mjs",
+      "classification": "ADDED_ACCEPTED_SOURCE",
+      "base_git_sha256": null
+    },
+    {
+      "relative_path": "stateful-relay-v13-legacy-claimant-manifest-v1.mjs",
+      "classification": "ADDED_ACCEPTED_SOURCE",
+      "base_git_sha256": null
+    },
+    {
+      "relative_path": "stateful-relay-wake-delivery.mjs",
+      "classification": "ACCEPTED_BEHAVIOR_CHANGE",
+      "base_git_sha256": "9fae1ad636d744c55674ca1854f88e2e8d72b706f5fcf5766e164b3ab1a0050a"
+    }
+  ]
+}

@@ -1,42 +1,23 @@
-# Stateful Relay V1 Public Dependency Manifest
+# Public Maintenance Dependency Manifest
 
-source_frozen_commit: `a6e7bedb27b8858432bb106d2c85e559992feaa7`
-source_frozen_tree: `e908c8f9fde81569e5449463d1df96a1e112d941`
-scope: runtime, schema, tests, and package metadata required by the public candidate
-manifest_self_excluded: true
+All inherited execution source comes from golden commit
+ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83. Public metadata and portable acceptance
+tests are prepared in this candidate and included in its canonical
+[public inventory](deployment/stateful-relay-public-maintenance.manifest.json).
 
-Every listed path was extracted from the frozen Git object. The package
-metadata row additionally records the deterministic candidate-only package
-promotion (`private: false`, public exports, candidate version, and Node engine)
-applied after extraction. No current working-tree file is a dependency source.
+The runtime package has no external package dependencies. It uses Node built-in
+modules and requires the existing Node engine contract. The exact source
+closure is independently hash-bound by
+[the golden source manifest](deployment/stateful-relay-v13-golden-source.manifest.json).
 
-## Closure
+The optional Windows launcher requires Windows PowerShell and a separately
+authorized owner deployment. Its public source does not include any installed
+Scheduler definition, credential data, owner mapping or live configuration.
+The Native executor requires a separately verified official Codex binary; the
+accepted 0.153.4 executable identity and capability digest are non-secret
+compatibility records, not an installation or runtime-rebind action.
 
-Format: `path<TAB>source_commit<TAB>size_bytes<TAB>sha256<TAB>reason`.
-Paths are UTF-8 bytewise sorted.
-
-```text
-LICENSE	a6e7bedb27b8858432bb106d2c85e559992feaa7	11358	cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30	distribution license
-native-agent-relay-consumer.mjs	a6e7bedb27b8858432bb106d2c85e559992feaa7	6530	3d80c7aba4844a47e612bc25cbb2be81b53c3fe7d62d7fc33edc841fed74c927	native Codex consumer facade
-package-lock.json	a6e7bedb27b8858432bb106d2c85e559992feaa7	292	a6b048c0c6411cd36bf0bb3475a2fedd000e52e57b3c611e869bc434fcb722a6	reproducible dependency/install metadata
-package.json	a6e7bedb27b8858432bb106d2c85e559992feaa7	865	975a92a10f4d0de42318bdc09ad5a994705d9c2790ccd9d27c9e30769c3bdaf6	package metadata and public exports; candidate metadata transform
-stateful-agent-relay-consumer.mjs	a6e7bedb27b8858432bb106d2c85e559992feaa7	6409	899f08dae3212855e0294103e6702d327ca3c2403c90d3394c99b7a14f35c6dd	bounded Relay consumer
-stateful-agent-relay-lifecycle.mjs	a6e7bedb27b8858432bb106d2c85e559992feaa7	7773	33abf53bf3690fa3e920676c9b0ea4d46b0706e5919d1d6fe2075e49e9530bbc	lifecycle evidence model
-stateful-agent-relay-manual-dispatch.mjs	a6e7bedb27b8858432bb106d2c85e559992feaa7	12215	6c437fd65162a303c8b6e33b5af729911bfc8a61a0cffcced40249f9ac992c41	GPT/Codex bounded dispatch facade
-stateful-agent-relay-notification.mjs	a6e7bedb27b8858432bb106d2c85e559992feaa7	1307	e5361e6cb27f87c8cac3192b96e3a90cfe182f47c55d80c6785a308b2811ccfa	durable metadata-only notifications
-stateful-agent-relay-operator.mjs	a6e7bedb27b8858432bb106d2c85e559992feaa7	12725	4e63b866a0f3d9fa64d28006b1d53a0efd9d9de41ff31cebe8be2958412950d7	bounded operator facade
-stateful-agent-relay-recovery.mjs	a6e7bedb27b8858432bb106d2c85e559992feaa7	7350	d96daa4ee77120d71f62e38002e7b149dcac9c07e416586e7f004881771dffa7	read-only recovery UX
-stateful-agent-relay-store.mjs	a6e7bedb27b8858432bb106d2c85e559992feaa7	43550	1131cba815439fc6dd99fd9e9b2dc7fa7d65b4836e92cde163d71adef3bfa914	durable append-only store
-stateful-relay-result.schema.json	a6e7bedb27b8858432bb106d2c85e559992feaa7	802	3a57ead5f1575fb52afbb3eb6f642ed0897e31168d491af717989d8aaf96fdbc	public result schema export
-tests/native-agent-relay-consumer.test.mjs	a6e7bedb27b8858432bb106d2c85e559992feaa7	7721	b7da17185d80340754e2695b4f282affeb2770fe11f6f68696a4a516360b4394	native consumer security tests
-tests/stateful-agent-relay-lifecycle.test.mjs	a6e7bedb27b8858432bb106d2c85e559992feaa7	7167	7e97398523b6019757d00f083e72e2b0899fe36002aaa2a9ab84fa0fdb8478d9	lifecycle regression tests
-tests/stateful-agent-relay-manual-dispatch.test.mjs	a6e7bedb27b8858432bb106d2c85e559992feaa7	21554	7e9fb76f447f0fe8a7a086205e552ecf5afc1fc08dbb5737fa28c8ccaadf131a	dispatch regression tests
-tests/stateful-agent-relay-notification.test.mjs	a6e7bedb27b8858432bb106d2c85e559992feaa7	13156	f3d95f089b69392201af6eacb3de9b3257da8dce3f4ae187536baf8ea65ace09	notification regression tests
-tests/stateful-agent-relay-operator.test.mjs	a6e7bedb27b8858432bb106d2c85e559992feaa7	19807	a9554ef9947b8e132a2793102534dbc40bea8dbf8679e93c9685f7589f27caf7	operator security tests
-tests/stateful-agent-relay-recovery.test.mjs	a6e7bedb27b8858432bb106d2c85e559992feaa7	15721	fc931dddcc102a25b5dd75570758f8b03129c35e99381eaa2d84f050667c9245	recovery regression tests
-tests/stateful-agent-relay-restart.test.mjs	a6e7bedb27b8858432bb106d2c85e559992feaa7	6873	d42da69848ee0a10510f5c3a1bc9a0733d8f519e63ded44585b9ad049443391a	restart durability tests
-tests/stateful-agent-relay.test.mjs	a6e7bedb27b8858432bb106d2c85e559992feaa7	14151	c009e8fbcb03a259455ea570ee3fc566221d440f018d0ef354618df2dabe20ae	core relay regression tests
-```
-
-The runtime import closure is Node built-ins plus the eight local `.mjs`
-modules above; there are no npm dependencies or unlisted local runtime files.
+Independent tests execute a byte-identical export outside the project workspace
+with an isolated empty Codex home and no inherited private deployment variables.
+All fixtures are created in temporary directories. No private sibling checkout,
+auth store, live queue, runtime binding or visualization artifact is a dependency.

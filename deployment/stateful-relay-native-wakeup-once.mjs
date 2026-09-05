@@ -11,6 +11,7 @@ import {
   renameSync,
 } from "node:fs";
 import path from "node:path";
+import { DatabaseSync } from "node:sqlite";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ENTRYPOINT_PATH = fileURLToPath(import.meta.url);
@@ -35,6 +36,7 @@ export const NATIVE_WAKEUP_PRECLAIM_SUBSTAGES = Object.freeze([
   "NATIVE_WAKEUP_SIGNAL_MISSING",
   "NATIVE_WAKEUP_MODULE_LOAD_FAILED",
   "NATIVE_WAKEUP_CALLER_ARGUMENT_FORBIDDEN",
+  "NATIVE_WAKEUP_EXECUTION_CONTEXT_UNSUPPORTED",
 ]);
 
 const PRECLAIM_SUBSTAGE_SET = new Set(NATIVE_WAKEUP_PRECLAIM_SUBSTAGES);
@@ -57,6 +59,13 @@ export function normalizeNativeWakeupPreclaimSubstage(value) {
 
 function failPreclaim(code) {
   throw new StatefulRelayNativeWakeupPreclaimError(code);
+}
+
+export function classifyNativeWakeupParentContext(environment = process.env) {
+  const nestedKeys = ["CODEX_SESSION_ID", "CODEX_THREAD_ID", "CODEX_APP_TOOLS_PIPE_PATH"];
+  return nestedKeys.some((key) => typeof environment?.[key] === "string" && environment[key].length > 0)
+    ? "NESTED_CODEX_PARENT_CONTEXT"
+    : "BOUNDED_DEPLOYMENT_PARENT_CONTEXT";
 }
 
 function isPreclaimError(error) {
@@ -224,10 +233,10 @@ export function readDeploymentConfig(configPath = CONFIG_PATH) {
     "codex_runtime_sha256", "codex_runtime_executable", "codex_runtime_source",
     "codex_runtime_architecture", "codex_home_path", "output_directory_path",
     "timeout_ms", "payload_sha256", "phase_a_recovery_notification_id",
-  ]) || config.version !== "stateful-relay-native-wakeup-deployment/v1") {
+  ]) || config.version !== "stateful-relay-native-wakeup-deployment/v2") {
     fail("NATIVE_WAKEUP_DEPLOYMENT_CONFIG_INVALID");
   }
-  if (!exactKeys(config.payload_sha256, ["entrypoint", "wakeup", "executor", "sink"])) {
+  if (!exactKeys(config.payload_sha256, ["entrypoint", "wakeup", "executor", "sink", "invocation_profile", "wake_delivery"])) {
     fail("NATIVE_WAKEUP_DEPLOYMENT_CONFIG_INVALID");
   }
   if (
@@ -257,13 +266,61 @@ export function readDeploymentConfig(configPath = CONFIG_PATH) {
   return Object.freeze(config);
 }
 
-export function selectCorrelatedSignal(spoolDirectory) {
+export function selectCorrelatedSignal(spoolDirectory, databasePath) {
   const canonical = canonicalDirectory(spoolDirectory);
   const names = readdirSync(canonical).filter((name) => /^[0-9a-f-]{36}\.json$/u.test(name)).sort();
   if (names.length === 0) return null;
-  if (names.length !== 1) fail("NATIVE_WAKEUP_SIGNAL_COUNT_INVALID");
-  const signalPath = path.join(canonical, names[0]);
-  return Object.freeze({ signalPath: canonicalFile(signalPath), signal: JSON.parse(readFileSync(signalPath, "utf8")) });
+  if (names.length > 256) fail("NATIVE_WAKEUP_SIGNAL_COUNT_INVALID");
+  // Read only existing signal identities. Never retry, acknowledge, remove,
+  // or discover tasks from a historical pending-notification scan.
+  const database = new DatabaseSync(canonicalFile(databasePath), { readOnly: true });
+  try {
+    database.exec("PRAGMA query_only=ON; BEGIN");
+    const read = database.prepare(`
+      SELECT n.task_id, n.target_actor, n.type, n.state AS notification_state,
+             n.revision, t.project_id, t.execution_mode, t.client_request_id,
+             t.state AS task_state, t.claim_generation, t.claim_owner,
+             w.delivery_state, w.last_delivery_classification, w.signal_identity,
+             w.delivery_claim_owner, w.resume_generation,
+             w.preclaim_failure_resume_generation, w.preclaim_failure_stage
+      FROM notifications n JOIN tasks t ON t.task_id = n.task_id
+      JOIN stateful_relay_wake_deliveries w ON w.notification_id = n.notification_id
+        AND w.task_id = t.task_id
+      WHERE n.notification_id = ?
+    `);
+    const eligible = [];
+    for (const name of names) {
+      const signalPath = canonicalFile(path.join(canonical, name));
+      if (lstatSync(signalPath).size > 4096) fail("NATIVE_WAKEUP_SIGNAL_CORRELATION_FAILED");
+      const signal = JSON.parse(readFileSync(signalPath, "utf8"));
+      if (signal?.notification_id !== name.slice(0, -5)) fail("NATIVE_WAKEUP_SIGNAL_CORRELATION_FAILED");
+      const row = read.get(signal.notification_id);
+      if (!row || row.task_id !== signal.task_id || row.target_actor !== "CODEX" ||
+          row.type !== "TASK_READY" || row.type !== signal.notification_type ||
+          row.revision !== signal.notification_revision || row.project_id !== signal.project_id ||
+          row.execution_mode !== "read_only" || row.execution_mode !== signal.execution_mode ||
+          row.client_request_id !== signal.client_request_id) {
+        fail("NATIVE_WAKEUP_SIGNAL_CORRELATION_FAILED");
+      }
+      if (row.notification_state !== "PENDING" || row.task_state !== "READY_FOR_CODEX" ||
+          row.claim_generation !== 0 || row.claim_owner !== null || row.delivery_claim_owner !== null) continue;
+      const pending = row.delivery_state === "NOT_DELIVERED" &&
+        row.last_delivery_classification === "POST_COMMIT_WAKE_PENDING" && row.signal_identity === null;
+      const requested = row.delivery_state === "WAKE_REQUESTED" &&
+        row.last_delivery_classification === "WAKE_REQUESTED" && row.signal_identity === `notification:${signal.notification_id}`;
+      // Only an explicit resume may advance beyond the recorded failure.
+      const resumed = row.delivery_state === "RECOVERY_REQUIRED" &&
+        row.last_delivery_classification === "POST_COMMIT_WAKE_DELIVERY_FAILED" &&
+        row.signal_identity === `notification:${signal.notification_id}` && row.preclaim_failure_stage !== null &&
+        Number.isSafeInteger(row.preclaim_failure_resume_generation) &&
+        row.resume_generation > row.preclaim_failure_resume_generation;
+      if (pending || requested || resumed) eligible.push(Object.freeze({ signalPath, signal }));
+    }
+    if (eligible.length > 1) fail("NATIVE_WAKEUP_SIGNAL_COUNT_INVALID");
+    return eligible[0] ?? null;
+  } finally {
+    database.close();
+  }
 }
 
 function loadExecutionRegistry(raw, createTrustedExecutionRegistry) {
@@ -425,6 +482,9 @@ async function reconcileNativeWakeupPreclaimFailure({
 
 export async function runNativeWakeupOnce(configPath = CONFIG_PATH) {
   if (process.argv.length !== 2) failPreclaim("NATIVE_WAKEUP_CALLER_ARGUMENT_FORBIDDEN");
+  if (classifyNativeWakeupParentContext() !== "BOUNDED_DEPLOYMENT_PARENT_CONTEXT") {
+    failPreclaim("NATIVE_WAKEUP_EXECUTION_CONTEXT_UNSUPPORTED");
+  }
   let config = null;
   let modulePaths = null;
   let selected = null;
@@ -440,6 +500,7 @@ export async function runNativeWakeupOnce(configPath = CONFIG_PATH) {
   modulePaths = {
     wakeup: withPreclaimStage("NATIVE_WAKEUP_PAYLOAD_IDENTITY_MISMATCH", () => canonicalFile(path.join(candidateRoot, "stateful-relay-native-wakeup.mjs"))),
     executor: withPreclaimStage("NATIVE_WAKEUP_PAYLOAD_IDENTITY_MISMATCH", () => canonicalFile(path.join(candidateRoot, "stateful-relay-native-readonly-executor.mjs"))),
+    invocation_profile: withPreclaimStage("NATIVE_WAKEUP_PAYLOAD_IDENTITY_MISMATCH", () => canonicalFile(path.join(candidateRoot, "stateful-relay-codex-invocation-profile-v1.mjs"))),
     sink: withPreclaimStage("NATIVE_WAKEUP_PAYLOAD_IDENTITY_MISMATCH", () => canonicalFile(path.join(candidateRoot, "deployment", "windows-stateful-relay-native-wakeup-sink.mjs"))),
     consumer: withPreclaimStage("NATIVE_WAKEUP_PAYLOAD_IDENTITY_MISMATCH", () => canonicalFile(path.join(candidateRoot, "stateful-agent-relay-consumer.mjs"))),
     notification: withPreclaimStage("NATIVE_WAKEUP_PAYLOAD_IDENTITY_MISMATCH", () => canonicalFile(path.join(candidateRoot, "stateful-agent-relay-notification.mjs"))),
@@ -451,6 +512,8 @@ export async function runNativeWakeupOnce(configPath = CONFIG_PATH) {
     entrypoint: sha256File(ENTRYPOINT_PATH),
     wakeup: sha256File(modulePaths.wakeup),
     executor: sha256File(modulePaths.executor),
+    invocation_profile: sha256File(modulePaths.invocation_profile),
+    wake_delivery: sha256File(modulePaths.wakeDelivery),
     sink: sha256File(modulePaths.sink),
   }));
   for (const [name, digest] of Object.entries(expected)) {
@@ -460,9 +523,9 @@ export async function runNativeWakeupOnce(configPath = CONFIG_PATH) {
   withPreclaimStage("NATIVE_WAKEUP_REGISTRY_REJECTED", () => canonicalFile(config.execution_registry_path));
   withPreclaimStage("NATIVE_WAKEUP_PROJECT_MAPPING_FAILED", () => canonicalFile(config.project_mapping_path));
   try {
-    selected = selectCorrelatedSignal(config.signal_spool_directory);
+    selected = selectCorrelatedSignal(config.signal_spool_directory, config.database_path);
   } catch (error) {
-    if (error?.code === "NATIVE_WAKEUP_SIGNAL_COUNT_INVALID") {
+    if (["NATIVE_WAKEUP_SIGNAL_COUNT_INVALID", "NATIVE_WAKEUP_SIGNAL_CORRELATION_FAILED"].includes(error?.code)) {
       failPreclaim("NATIVE_WAKEUP_SIGNAL_CORRELATION_FAILED");
     }
     failPreclaim("NATIVE_WAKEUP_SIGNAL_READ_FAILED");
@@ -498,11 +561,16 @@ export async function runNativeWakeupOnce(configPath = CONFIG_PATH) {
   }
   assertRuntimeArchitecture(codexRuntimePath, config.codex_runtime_architecture);
 
-  const [{ openStatefulRelayStore }, { createTrustedProjectRegistry }, { createRelayWakeupNotificationApi }, { createTrustedExecutionRegistry }, { createStatefulRelayNativeReadOnlyExecutor }, { createStatefulRelayOneShotWakeConsumer, validateStatefulRelayWakeSignal }] = await withAsyncPreclaimStage("NATIVE_WAKEUP_MODULE_LOAD_FAILED", () => Promise.all([
+  const [{ openStatefulRelayStore }, { createTrustedProjectRegistry }, { createRelayWakeupNotificationApi }, { createTrustedExecutionRegistry }, { createStatefulRelayNativeReadOnlyExecutor }, { createStatefulRelayOneShotWakeConsumer, validateStatefulRelayWakeSignal }, { resolveStatefulRelayCodexInvocationProfile }] = await withAsyncPreclaimStage("NATIVE_WAKEUP_MODULE_LOAD_FAILED", () => Promise.all([
     import(pathToFileURL(modulePaths.store)), import(pathToFileURL(modulePaths.consumer)),
     import(pathToFileURL(modulePaths.notification)), import(pathToFileURL(modulePaths.registry)),
     import(pathToFileURL(modulePaths.executor)), import(pathToFileURL(modulePaths.wakeup)),
+    import(pathToFileURL(modulePaths.invocation_profile)),
   ]));
+  // Unsupported CLI identity must fail before acquiring a task claim.
+  withPreclaimStage("NATIVE_WAKEUP_EXECUTOR_START_FAILED", () => resolveStatefulRelayCodexInvocationProfile({
+    verified_runtime_sha256: config.codex_runtime_sha256,
+  }));
   const executionRegistry = withPreclaimStage("NATIVE_WAKEUP_REGISTRY_REJECTED", () => loadExecutionRegistry(
     readJsonPreclaimFile(config.execution_registry_path, "NATIVE_WAKEUP_REGISTRY_REJECTED"),
     createTrustedExecutionRegistry,

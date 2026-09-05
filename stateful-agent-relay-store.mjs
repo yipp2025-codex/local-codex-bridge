@@ -19,6 +19,16 @@ import {
   ensureStatefulRelayWakeDeliveryRow,
   ensureStatefulRelayWakeDeliverySchema,
 } from "./stateful-relay-wake-delivery.mjs";
+import {
+  assertTaskClaimantFenceV1,
+  bindTaskClaimantContextV1,
+  ensureTaskClaimantAuthoritySchemaV1,
+  initializeNewStoreLegacyClaimantAuthorityV1,
+  readTaskClaimantAuthorityV1,
+  STATEFUL_RELAY_LEGACY_CLAIMANT_ID,
+  transitionTaskClaimantAuthorityInTransactionV1,
+  validateTaskClaimantContextV1,
+} from "./stateful-relay-task-claimant-authority-v1.mjs";
 
 export const RELAY_ACTORS = Object.freeze(["GPT", "CODEX", "SYSTEM"]);
 export const RELAY_STATES = Object.freeze([
@@ -1613,6 +1623,14 @@ export class StatefulRelayStore {
     return Number(this.database.prepare("SELECT COUNT(*) AS count FROM tasks").get().count);
   }
 
+  readTaskClaimantAuthority() {
+    return readTaskClaimantAuthorityV1(this.database);
+  }
+
+  bindTaskClaimantSession(claimantId) {
+    return bindTaskClaimantContextV1(this.database, claimantId);
+  }
+
   #transaction(callback) {
     this.database.exec("BEGIN IMMEDIATE");
     try {
@@ -2363,10 +2381,14 @@ export class StatefulRelayStore {
     });
   }
 
-  claimTask(taskId, claimOwner = "CODEX") {
+  #claimTaskWithClaimant(taskId, claimOwner, claimantContext) {
     const normalizedTaskId = validateTaskId(taskId);
     const normalizedClaimOwner = validateClaimOwner(claimOwner);
     return this.#transaction(() => {
+      const effectiveClaimantContext = claimantContext === null
+        ? bindTaskClaimantContextV1(this.database, STATEFUL_RELAY_LEGACY_CLAIMANT_ID)
+        : validateTaskClaimantContextV1(claimantContext);
+      assertTaskClaimantFenceV1(this.database, effectiveClaimantContext);
       const task = this.#task(normalizedTaskId);
       if (task.state !== "READY_FOR_CODEX") {
         throw new StatefulRelayError(
@@ -2391,6 +2413,8 @@ export class StatefulRelayStore {
         body: JSON.stringify({
           task_id: normalizedTaskId,
           action: "claim",
+          claimant_id: effectiveClaimantContext.claimant_id,
+          claimant_epoch: effectiveClaimantContext.claimant_epoch,
           claim_generation: claimGeneration,
           claim_expires_at: claimExpiresAt,
         }),
@@ -2406,10 +2430,26 @@ export class StatefulRelayStore {
     });
   }
 
-  reclaimTask(taskId, claimOwner = "CODEX") {
+  claimTask(taskId, claimOwner = "CODEX") {
+    return this.#claimTaskWithClaimant(taskId, claimOwner, null);
+  }
+
+  claimTaskForClaimant({
+    taskId,
+    claimantContext,
+    claimOwner = "CODEX",
+  } = {}) {
+    return this.#claimTaskWithClaimant(taskId, claimOwner, claimantContext);
+  }
+
+  #reclaimTaskWithClaimant(taskId, claimOwner, claimantContext) {
     const normalizedTaskId = validateTaskId(taskId);
     const normalizedClaimOwner = validateClaimOwner(claimOwner);
     return this.#transaction(() => {
+      const effectiveClaimantContext = claimantContext === null
+        ? bindTaskClaimantContextV1(this.database, STATEFUL_RELAY_LEGACY_CLAIMANT_ID)
+        : validateTaskClaimantContextV1(claimantContext);
+      assertTaskClaimantFenceV1(this.database, effectiveClaimantContext);
       const task = this.#task(normalizedTaskId);
       if (task.state !== "CLAIMED" && task.state !== "RUNNING") {
         throw new StatefulRelayError(
@@ -2440,6 +2480,8 @@ export class StatefulRelayStore {
         body: JSON.stringify({
           task_id: normalizedTaskId,
           action: "reclaim",
+          claimant_id: effectiveClaimantContext.claimant_id,
+          claimant_epoch: effectiveClaimantContext.claimant_epoch,
           previous_state: task.state,
           previous_claim_generation: previousGeneration,
           previous_claim_expires_at: task.claim_expires_at,
@@ -2456,6 +2498,36 @@ export class StatefulRelayStore {
       });
       return this.readTask(normalizedTaskId);
     });
+  }
+
+  reclaimTask(taskId, claimOwner = "CODEX") {
+    return this.#reclaimTaskWithClaimant(taskId, claimOwner, null);
+  }
+
+  reclaimTaskForClaimant({
+    taskId,
+    claimantContext,
+    claimOwner = "CODEX",
+  } = {}) {
+    return this.#reclaimTaskWithClaimant(taskId, claimOwner, claimantContext);
+  }
+
+  transitionTaskClaimantAuthority({
+    expectedClaimant,
+    expectedEpoch,
+    expectedRevision,
+    nextClaimant,
+  } = {}) {
+    return this.#transaction(() => transitionTaskClaimantAuthorityInTransactionV1(
+      this.database,
+      {
+        expectedClaimant,
+        expectedEpoch,
+        expectedRevision,
+        nextClaimant,
+        updatedAt: this.#nowIso(),
+      },
+    ));
   }
 
   updateState({
@@ -2965,7 +3037,23 @@ export async function openStatefulRelayStore(databasePath, options = {}) {
   }
   const database = new DatabaseSync(databasePath);
   try {
+    const existingTaskStore = Boolean(database.prepare(`
+      SELECT 1 AS present FROM sqlite_schema
+      WHERE type = 'table' AND name = 'tasks'
+    `).get());
     database.exec(SCHEMA);
+    ensureTaskClaimantAuthoritySchemaV1(database);
+    const authorityPresent = Boolean(database.prepare(`
+      SELECT 1 AS present FROM stateful_relay_task_claimant_authority
+      WHERE singleton = 1
+    `).get());
+    if (!authorityPresent && !existingTaskStore) {
+      initializeNewStoreLegacyClaimantAuthorityV1(
+        database,
+        new Date().toISOString(),
+      );
+    }
+    readTaskClaimantAuthorityV1(database);
     ensureStatefulRelayWakeDeliverySchema(database, { now: options.now });
     ensureManualDispatchColumns(database);
     return new StatefulRelayStore(database, options);

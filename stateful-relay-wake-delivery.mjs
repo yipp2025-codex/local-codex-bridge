@@ -1110,6 +1110,14 @@ export function recordStatefulRelayWakePreclaimFailure(
       current.last_delivery_classification === "WAKE_REQUESTED" &&
       current.signal_identity === signalId;
 
+    const resumedPreclaimRow = current.delivery_state === "RECOVERY_REQUIRED" &&
+      current.last_delivery_classification === RECOVERY_FAILURE_CLASSIFICATION &&
+      current.signal_identity === signalId &&
+      PRECLAIM_RECOVERABLE_SUBSTAGE_SET.has(current.preclaim_failure_stage) &&
+      current.preclaim_failure_task_generation === 0 &&
+      current.preclaim_failure_delivery_attempt_generation === current.delivery_attempt_generation &&
+      current.preclaim_failure_resume_generation < current.resume_generation;
+
     if (
       current.task_id === taskId &&
       current.delivery_state === "RECOVERY_REQUIRED" &&
@@ -1118,7 +1126,7 @@ export function recordStatefulRelayWakePreclaimFailure(
       current.signal_identity === signalId &&
       current.preclaim_failure_task_generation === 0 &&
       current.preclaim_failure_delivery_attempt_generation === current.delivery_attempt_generation &&
-      current.preclaim_failure_resume_generation <= current.resume_generation
+      current.preclaim_failure_resume_generation === current.resume_generation
     ) {
       return current;
     }
@@ -1140,7 +1148,7 @@ export function recordStatefulRelayWakePreclaimFailure(
       hasResultEvent(database, taskId) ||
       !hasCompleteTaskLineage(database, task) ||
       current.task_id !== taskId ||
-      (!normalPendingRow && !normalRequestedRow) ||
+      (!normalPendingRow && !normalRequestedRow && !resumedPreclaimRow) ||
       current.delivery_claim_owner !== null
     ) {
       fail("WAKE_PRECLAIM_RECONCILIATION_NOT_ELIGIBLE");

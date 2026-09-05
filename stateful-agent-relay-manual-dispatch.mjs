@@ -17,6 +17,7 @@ import {
   STATEFUL_RELAY_CAPABILITY_STATE_ARMED,
 } from "./stateful-relay-capability.mjs";
 import { createRecoveryUxApi } from "./stateful-agent-relay-recovery.mjs";
+import { STATEFUL_RELAY_LEGACY_CLAIMANT_ID } from "./stateful-relay-task-claimant-authority-v1.mjs";
 import { StatefulRelayStore } from "./stateful-agent-relay-store.mjs";
 
 export const MANUAL_DISPATCH_OPERATIONS = Object.freeze([
@@ -609,6 +610,9 @@ export function createManualDispatchApi({
   });
   const trustedCodexConsumerId = normalizeClaimOwner(codexConsumerId);
   const recoveryApi = createRecoveryUxApi(store);
+  const claimantContext = store.bindTaskClaimantSession(
+    STATEFUL_RELAY_LEGACY_CLAIMANT_ID,
+  );
 
   const api = {
     send_task(args, auth) {
@@ -659,7 +663,11 @@ export function createManualDispatchApi({
           );
         }
         const taskBody = taskBodyFromRead(beforeClaim);
-        const claimed = store.claimTask(signal.task_id, trustedCodexConsumerId);
+        const claimed = store.claimTaskForClaimant({
+          taskId: signal.task_id,
+          claimantContext,
+          claimOwner: trustedCodexConsumerId,
+        });
         store.markNotificationDelivered(signal.notification_id, "CODEX");
         store.acknowledgeNotification(signal.notification_id, "CODEX");
         return {
@@ -679,7 +687,11 @@ export function createManualDispatchApi({
       if (stale.length === 0) {
         return { status: "EMPTY" };
       }
-      const reclaimed = store.reclaimTask(stale[0].task_id, trustedCodexConsumerId);
+      const reclaimed = store.reclaimTaskForClaimant({
+        taskId: stale[0].task_id,
+        claimantContext,
+        claimOwner: trustedCodexConsumerId,
+      });
       if (!reclaimed.integrity.valid) {
         throw new ManualDispatchError(
           "MANUAL_DISPATCH_EVENT_CHAIN_INVALID",

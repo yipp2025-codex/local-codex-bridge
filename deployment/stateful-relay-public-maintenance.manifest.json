@@ -1,0 +1,1144 @@
+{
+  "schema_version": "stateful-relay-public-maintenance-release/v1",
+  "public_baseline_commit": "6acb07e43767d6e542589dc6ad8a32f1a298f6ab",
+  "public_baseline_tag": "v1.0.0-stateful-relay.3",
+  "public_target_branch": "main",
+  "local_candidate_branch": "release/stateful-relay-v1.3-bidirectional-maintenance",
+  "golden_source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+  "golden_source_parent": "ad99154e45d13e29ff6d8eaa5011823e87b55163",
+  "golden_source_tag": "stateful-relay-v1.3-final-freeze.2",
+  "source_closure_digest": "c70d1af7f2fbd2a3822a2781a016bf7fba082fe5227ce74566bd8a96385bcc49",
+  "source_manifest": "deployment/stateful-relay-v13-golden-source.manifest.json",
+  "source_manifest_sha256": "3f0e59288853560556a57a90f89c94e12b799eddf54bc03f79a6a6e052f6b723",
+  "public_files": [
+    {
+      "relative_path": ".env.local.example",
+      "size_bytes": 1122,
+      "sha256": "ea7ff4114701309c2978fe6dd541d12c4233e70248eabca8688befde39b773e7"
+    },
+    {
+      "relative_path": ".gitattributes",
+      "size_bytes": 71,
+      "sha256": "a13704f82e0103bac93100a3cbd2db230d3bc811a08cef10cdb83295f3ca720c"
+    },
+    {
+      "relative_path": ".gitignore",
+      "size_bytes": 381,
+      "sha256": "57f89d19d90a66566d2465dd7a5767d28577c65cda5115dda73944bc3f8397f3"
+    },
+    {
+      "relative_path": "CHANGELOG.md",
+      "size_bytes": 3079,
+      "sha256": "7818427f44cf75a078f689835eddbe4ceb777eb0df28265f94cb9f6b97c00613"
+    },
+    {
+      "relative_path": "LICENSE",
+      "size_bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "relative_path": "MCP_DEPLOYMENT_ADAPTER.md",
+      "size_bytes": 8703,
+      "sha256": "a463d19e0fc5b0a95beb16a7c417d54a1c6b807247c7073868c7343f70b8fd9c"
+    },
+    {
+      "relative_path": "MIGRATION.md",
+      "size_bytes": 631,
+      "sha256": "1e446ce8975b0cb2ba382fa8c6dfa323f573ee79e101b527a1ddc8b656993c69"
+    },
+    {
+      "relative_path": "NOTICE.md",
+      "size_bytes": 312,
+      "sha256": "6b39a3818842623f42ceeb887afff9b94b46291f32d0f27a3d0088f430d902a8"
+    },
+    {
+      "relative_path": "PROGRESS.md",
+      "size_bytes": 1015,
+      "sha256": "66de2944a8c79f172a9485281b05f0188bc6f32abb602216426294378673e013"
+    },
+    {
+      "relative_path": "PUBLIC_DEPENDENCY_MANIFEST.md",
+      "size_bytes": 1385,
+      "sha256": "76d01cf05d25020b50cda43c22ec6cceebf2067dae10829bfc4edfc9c39649ab"
+    },
+    {
+      "relative_path": "PUBLIC_RELEASE_CANDIDATE_MANIFEST.md",
+      "size_bytes": 2359,
+      "sha256": "eb710db20ae2560d97d1234948a46c21d076160acad8ad77bbe4f92af77592b9"
+    },
+    {
+      "relative_path": "README.md",
+      "size_bytes": 7487,
+      "sha256": "af6f53e0ae90a212fa01895ed5aa4758c2fa0d307654b1e169bd9f16ad04501c"
+    },
+    {
+      "relative_path": "SECURITY_BOUNDARY.md",
+      "size_bytes": 4272,
+      "sha256": "1179eb68f561715acdb0d1d7d53f394c798990fa8e4881e265db637946c9483a"
+    },
+    {
+      "relative_path": "STATEFUL_RELAY_BOUNDED_WRITE_SKILL_V1_RELEASE_MANIFEST.md",
+      "size_bytes": 7123,
+      "sha256": "c5912b497efac9ef1f16779f158194059144a6c26fc63092bdb8a86c7897bd4f"
+    },
+    {
+      "relative_path": "STATEFUL_RELAY_V13_FINAL_FREEZE_MANIFEST.md",
+      "size_bytes": 12787,
+      "sha256": "a228146342fddc4e5e2c04ee0dabf87752f0640f2b045c3bce20d7a61353dfb8"
+    },
+    {
+      "relative_path": "STATEFUL_RELAY_V13_GOLDEN_FREEZE_MANIFEST.md",
+      "size_bytes": 2734,
+      "sha256": "6f94abc89a2532026eccb10c009430620f00b3d1a47187b15f6354052db0e26b"
+    },
+    {
+      "relative_path": "STATEFUL_RELAY_V13_MULTI_PROJECT_DISPATCH_CANDIDATE.md",
+      "size_bytes": 4328,
+      "sha256": "51f7c0f7af9fbf12a4869c8720e65167d39de05a16a41f2015f0689a3643bc95"
+    },
+    {
+      "relative_path": "STATEFUL_RELAY_V13_NATIVE_WAKEUP_ENABLEMENT_CANDIDATE.md",
+      "size_bytes": 4195,
+      "sha256": "ab77cbce09fc6ee0b5f6f58d1d2b78ec1bd01f3c0a6f6915fd2582eef13a4a79"
+    },
+    {
+      "relative_path": "TASKS.md",
+      "size_bytes": 462,
+      "sha256": "7b4010d8d2fc4a017e111324cd945af83c050a0e6757d019e1b730c757e0ee95"
+    },
+    {
+      "relative_path": "USAGE.md",
+      "size_bytes": 643,
+      "sha256": "0ef2e0491ad3c91b77e6ca51451be51a5cb38ee25a7f9f3d5294ec7c0f432e2b"
+    },
+    {
+      "relative_path": "deployment/STATEFUL_RELAY_ORCHESTRATOR_SKILL_V13_WAKEUP_CANDIDATE.md",
+      "size_bytes": 942,
+      "sha256": "3b97279cdc73f9800e8a5fb5d590e45dccbe97b2729ec2016f74b23d32d6e7f7"
+    },
+    {
+      "relative_path": "deployment/STATEFUL_RELAY_V13_NATIVE_WAKEUP_DEPLOYMENT_PLAN.md",
+      "size_bytes": 2744,
+      "sha256": "7246e13e717b7ebafb5dae5bf564ee9dc5c1ae0ce5c4203b60df3078ba1e7934"
+    },
+    {
+      "relative_path": "deployment/deployment-owner-identity.ps1",
+      "size_bytes": 3998,
+      "sha256": "0b2fc798b7eddf3303636bb1c4bc61612c1ef8a985f1cc5765ef72bdee401d83"
+    },
+    {
+      "relative_path": "deployment/recover-next-stateful-relay-native-wake.mjs",
+      "size_bytes": 7540,
+      "sha256": "5f321522377fe096d97319733db1e15fe1bba26fb768cf387c699bbe74576123"
+    },
+    {
+      "relative_path": "deployment/resume-next-stateful-relay-native-wake.mjs",
+      "size_bytes": 7631,
+      "sha256": "c2f663b653c5ca1963517d22592ac121bf020f781e226d16f53048bdcc09cd10"
+    },
+    {
+      "relative_path": "deployment/start-stateful-relay-native-wakeup-once.ps1",
+      "size_bytes": 2697,
+      "sha256": "2661699a880e1c38b8320dff0f49bd71784b80a8cd088ee6b99fe81b9d13b4a0"
+    },
+    {
+      "relative_path": "deployment/stateful-relay-native-wakeup-launcher-contract.ps1",
+      "size_bytes": 6610,
+      "sha256": "dfcaac4f45dd4d8dd9cb0b7afd786e856d10515a668267d1474bbc2b35df089d"
+    },
+    {
+      "relative_path": "deployment/stateful-relay-native-wakeup-once.mjs",
+      "size_bytes": 28153,
+      "sha256": "7f981a30b64ac29aaf2bb80f658382ffc2c27a345254d86ab119930a4a20cdd9"
+    },
+    {
+      "relative_path": "deployment/stateful-relay-v13-execution-registry.example.json",
+      "size_bytes": 539,
+      "sha256": "86773eafe2cd4a18f98c5c42c73cd6043e8857572cc0dd2369e4741c921d622b"
+    },
+    {
+      "relative_path": "deployment/stateful-relay-v13-golden-source.manifest.json",
+      "size_bytes": 31194,
+      "sha256": "3f0e59288853560556a57a90f89c94e12b799eddf54bc03f79a6a6e052f6b723"
+    },
+    {
+      "relative_path": "deployment/windows-stateful-relay-native-wakeup-sink.mjs",
+      "size_bytes": 9929,
+      "sha256": "f1f77143ab31eda95d19d61dfbbf111482b97c9384ae8cff0053e09c7e1d41e2"
+    },
+    {
+      "relative_path": "mcp-server.mjs",
+      "size_bytes": 10685,
+      "sha256": "d526ecc68068852b707073fd1c67919ada4721b531bcaa879d72667c4c62b4a5"
+    },
+    {
+      "relative_path": "native-agent-relay-consumer.mjs",
+      "size_bytes": 7051,
+      "sha256": "2fdbcf4f8376204665b2be8d04e9832c80328a2e8e8a4d0ba0775bebe79ab496"
+    },
+    {
+      "relative_path": "package-lock.json",
+      "size_bytes": 292,
+      "sha256": "4b900a27ff675e3daa5045322e528e6ab7e26697006326d38b383fb314d3cbf1"
+    },
+    {
+      "relative_path": "package.json",
+      "size_bytes": 1915,
+      "sha256": "895ca449d9e4451fd54a50db3fb0be476afca8c28e71457cf43d7b84621a5894"
+    },
+    {
+      "relative_path": "project-allowlist.example.json",
+      "size_bytes": 21,
+      "sha256": "e25019622c211b22a6c905072397c051b71f680107344f9783ecadde1c7177bc"
+    },
+    {
+      "relative_path": "project-read-data-plane.mjs",
+      "size_bytes": 28312,
+      "sha256": "7d8923b03360f0a8b4e02811bb80e70b14b2b686d9b16f218c16ae551fa81583"
+    },
+    {
+      "relative_path": "skill-payload/stateful-relay-orchestrator/SKILL.md",
+      "size_bytes": 3035,
+      "sha256": "f4dd8ed7d5342e3808ef2038bc181e3dc0c083346c9302ac2bac3971092374b7"
+    },
+    {
+      "relative_path": "stateful-agent-relay-consumer.mjs",
+      "size_bytes": 8479,
+      "sha256": "dc9bfdc073910321f9c442f3d147827454d99e96f0f2809121dfbe64e3bf3346"
+    },
+    {
+      "relative_path": "stateful-agent-relay-lifecycle.mjs",
+      "size_bytes": 8324,
+      "sha256": "afec20a10cdf72731a9e698a96cad987b01887066da15b65231a3d061a04dfd0"
+    },
+    {
+      "relative_path": "stateful-agent-relay-manual-dispatch.mjs",
+      "size_bytes": 33585,
+      "sha256": "650c4afab1d7d44fb1a42d71ab821630039870f092e7a21afcc5daf63176831d"
+    },
+    {
+      "relative_path": "stateful-agent-relay-notification.mjs",
+      "size_bytes": 1353,
+      "sha256": "22c9d8cdcd9af02ae5ce6e1cee24bee386bc2ede7962c0a166e9177782596f89"
+    },
+    {
+      "relative_path": "stateful-agent-relay-operator.mjs",
+      "size_bytes": 14397,
+      "sha256": "66383350ff22b3e1c7c381b755d0028ec90b74c8ee8551174b221f74186134a6"
+    },
+    {
+      "relative_path": "stateful-agent-relay-recovery.mjs",
+      "size_bytes": 8279,
+      "sha256": "5dc9fcb609252181d36b2bc0a9ad13cd4e06d555b11b292625f618407f7bbff4"
+    },
+    {
+      "relative_path": "stateful-agent-relay-store.mjs",
+      "size_bytes": 109819,
+      "sha256": "bbc473f43a5e20a860ca55476bc03bf797d97278bcd7f05c5cd6d67f5f195576"
+    },
+    {
+      "relative_path": "stateful-relay-bounded-write-fixture.mjs",
+      "size_bytes": 2461,
+      "sha256": "e6be03870dc3846a3d6fe388293057fa70ce042baa09b1ed5ef25ed89ce04337"
+    },
+    {
+      "relative_path": "stateful-relay-bounded-write.mjs",
+      "size_bytes": 44891,
+      "sha256": "d986c6447e5b471289615bc0dd396768db7035d06dd574a3595904d1b3bac187"
+    },
+    {
+      "relative_path": "stateful-relay-capability.mjs",
+      "size_bytes": 855,
+      "sha256": "ae200bad3bdd7b4d41d63c47ccb7620ab11a68c4368cbf8937b300c1689d1926"
+    },
+    {
+      "relative_path": "stateful-relay-codex-invocation-profile-v1.mjs",
+      "size_bytes": 4295,
+      "sha256": "9001fe3f83f6cc423919de4b528f10140c1fa94db07e3b32fc68370bf5525d61"
+    },
+    {
+      "relative_path": "stateful-relay-execution-registry.mjs",
+      "size_bytes": 4798,
+      "sha256": "0a68c16a3d61f6c3d4601e3066566494928479da20400e6bfd016bfca9577588"
+    },
+    {
+      "relative_path": "stateful-relay-mcp-adapter.mjs",
+      "size_bytes": 32714,
+      "sha256": "459d3b7be3b007b4c667cbdf2805fbfd38b23cf7bfa416c96b52ae396ad27fd2"
+    },
+    {
+      "relative_path": "stateful-relay-native-bounded-write.mjs",
+      "size_bytes": 26166,
+      "sha256": "933e2e2d311f335c306734ebee82f4658ca8589b4552b3eb997a62a3cfecfa8f"
+    },
+    {
+      "relative_path": "stateful-relay-native-mailbox-bounded-write.mjs",
+      "size_bytes": 22701,
+      "sha256": "1b7fbbf74df61defa391ccf30c0e2a191663017bf2400d7e290548fd131ea6b8"
+    },
+    {
+      "relative_path": "stateful-relay-native-readonly-executor.mjs",
+      "size_bytes": 29984,
+      "sha256": "76e1372955b985f7b4b3aca7db019a75c8b78df7e04f0a710825f625fc6e5a23"
+    },
+    {
+      "relative_path": "stateful-relay-native-skill-installer.mjs",
+      "size_bytes": 46773,
+      "sha256": "19cd28ed09aaebcf474eb3f1abddb173d42940d4b7df5575cfeaa78d123d9af7"
+    },
+    {
+      "relative_path": "stateful-relay-native-wakeup.mjs",
+      "size_bytes": 11112,
+      "sha256": "8eeb1f45e650aca85e6fa4dc74165ce6ab1bf06488d33d45460de94e226a8561"
+    },
+    {
+      "relative_path": "stateful-relay-result.schema.json",
+      "size_bytes": 802,
+      "sha256": "3a57ead5f1575fb52afbb3eb6f642ed0897e31168d491af717989d8aaf96fdbc"
+    },
+    {
+      "relative_path": "stateful-relay-skill-payload.mjs",
+      "size_bytes": 4197,
+      "sha256": "e3ba2dfb0a09206b86ce45315ca7df7fe83e2dcdccb15fb793f393f0f30d3cf6"
+    },
+    {
+      "relative_path": "stateful-relay-task-claimant-authority-v1.mjs",
+      "size_bytes": 11871,
+      "sha256": "95cffdb16695b9893c58b9a96b16ee24de16e1c083114fadc41ceb35a0a611f2"
+    },
+    {
+      "relative_path": "stateful-relay-v13-legacy-claimant-manifest-v1.mjs",
+      "size_bytes": 2911,
+      "sha256": "39f51b9952377ccca82b9302e5212014c3e82cd4242f1d69706b94c3d969d47b"
+    },
+    {
+      "relative_path": "stateful-relay-wake-delivery.mjs",
+      "size_bytes": 52448,
+      "sha256": "32496fb0ae084ca69ca171cec42399c391ac3ac8454b44895d7f303edbb85d6b"
+    },
+    {
+      "relative_path": "tests/native-agent-relay-consumer.test.mjs",
+      "size_bytes": 7721,
+      "sha256": "b7da17185d80340754e2695b4f282affeb2770fe11f6f68696a4a516360b4394"
+    },
+    {
+      "relative_path": "tests/stateful-agent-relay-lifecycle.test.mjs",
+      "size_bytes": 10505,
+      "sha256": "d96be7746552ffdfdef8ef4c310a2e5ce2c94c9d2d62523e2ad2f975e9121f2e"
+    },
+    {
+      "relative_path": "tests/stateful-agent-relay-manual-dispatch.test.mjs",
+      "size_bytes": 22124,
+      "sha256": "618bac05ff21ed6e42a2d7f39d6483f1149927591b461638bc21dd75fd01087c"
+    },
+    {
+      "relative_path": "tests/stateful-agent-relay-notification.test.mjs",
+      "size_bytes": 13156,
+      "sha256": "f3d95f089b69392201af6eacb3de9b3257da8dce3f4ae187536baf8ea65ace09"
+    },
+    {
+      "relative_path": "tests/stateful-agent-relay-operator.test.mjs",
+      "size_bytes": 20375,
+      "sha256": "a31391ecbfe0f09d7181259ee9ec50e6d265edaf79b123363d6fc2916df9f899"
+    },
+    {
+      "relative_path": "tests/stateful-agent-relay-recovery.test.mjs",
+      "size_bytes": 15745,
+      "sha256": "0ea3c95b69e87197e4b3be746a53134f04775c1cf071d1d250c7d5e804056d43"
+    },
+    {
+      "relative_path": "tests/stateful-agent-relay-restart.test.mjs",
+      "size_bytes": 6873,
+      "sha256": "d42da69848ee0a10510f5c3a1bc9a0733d8f519e63ded44585b9ad049443391a"
+    },
+    {
+      "relative_path": "tests/stateful-agent-relay.test.mjs",
+      "size_bytes": 14151,
+      "sha256": "c009e8fbcb03a259455ea570ee3fc566221d440f018d0ef354618df2dabe20ae"
+    },
+    {
+      "relative_path": "tests/stateful-relay-bounded-write.test.mjs",
+      "size_bytes": 20669,
+      "sha256": "fa95be7b853ca27ea54f438175aeff4190527844a7869d12a539f3977e4f6346"
+    },
+    {
+      "relative_path": "tests/stateful-relay-capability.test.mjs",
+      "size_bytes": 12560,
+      "sha256": "9973667f8ffd3e836de3d838df536260223ccf214eb20387932a68c2d172392d"
+    },
+    {
+      "relative_path": "tests/stateful-relay-codex-invocation-profile.test.mjs",
+      "size_bytes": 3496,
+      "sha256": "791b231ede5fb7a4f122ac034a13970b809e93a1c8548c502efab30f26f7d5f7"
+    },
+    {
+      "relative_path": "tests/stateful-relay-golden-manifest.test.mjs",
+      "size_bytes": 5816,
+      "sha256": "c8dac49ebd71e88c82123cd8ba4abcfc968203455cabf10cd82be9676eb0c59e"
+    },
+    {
+      "relative_path": "tests/stateful-relay-legacy-claimant-authority.test.mjs",
+      "size_bytes": 7372,
+      "sha256": "d8b853cf3398aca92b6fb54752f032e47566ee4ae3212e571df85d7af54b3868"
+    },
+    {
+      "relative_path": "tests/stateful-relay-legacy-migration.test.mjs",
+      "size_bytes": 16776,
+      "sha256": "803a3ce697b5d98c0d85333c02dcd9efa2b96a7ba316b777f904aa0828a69840"
+    },
+    {
+      "relative_path": "tests/stateful-relay-mcp-deployment-gates.test.mjs",
+      "size_bytes": 9479,
+      "sha256": "d3271b54c2438def866de3fb45823f7642dc762807a8f0c7fae325bee3445a50"
+    },
+    {
+      "relative_path": "tests/stateful-relay-native-bounded-write.test.mjs",
+      "size_bytes": 15145,
+      "sha256": "adbd4de3a0982856b3896db3077a821f0851b77283750534d11792e334cb11c1"
+    },
+    {
+      "relative_path": "tests/stateful-relay-native-mailbox-bounded-write.test.mjs",
+      "size_bytes": 11515,
+      "sha256": "166e2fa868766dba75d9337cbc7640c6053a28c83f52a2a6e717e6d64736377e"
+    },
+    {
+      "relative_path": "tests/stateful-relay-native-post-login-repair.test.mjs",
+      "size_bytes": 10832,
+      "sha256": "b06324a4c34594bff76588a9e53c3083b6c97979527206bb9da3e90bf36bab4d"
+    },
+    {
+      "relative_path": "tests/stateful-relay-native-readonly-executor.test.mjs",
+      "size_bytes": 23922,
+      "sha256": "4aef9ff6e2a160f99cb6b7faeb28fca1674b231e9c885b4e668f293e309cd666"
+    },
+    {
+      "relative_path": "tests/stateful-relay-native-skill-installer.test.mjs",
+      "size_bytes": 18093,
+      "sha256": "43f4988f3ef23e1e0f411ec70a1755fb63cc06fed0ac76521607ebbd37a6db00"
+    },
+    {
+      "relative_path": "tests/stateful-relay-native-wakeup.test.mjs",
+      "size_bytes": 22443,
+      "sha256": "cf91a5bfb6a31dab602ac3813fec192f2e47c0cee30df224ccc545c4fc88d6be"
+    },
+    {
+      "relative_path": "tests/stateful-relay-public-maintenance.test.mjs",
+      "size_bytes": 3038,
+      "sha256": "53ee2763b5ccbef0360e5c44ca8129da200cbbe7512663fabdfc8b1fe5629e7b"
+    },
+    {
+      "relative_path": "tests/stateful-relay-v13-multi-project-dispatch.test.mjs",
+      "size_bytes": 18000,
+      "sha256": "7e414f1a8c2d7d25492111e3fb1fecf706921f4ef1adb29a3292741aaaaa6fcb"
+    },
+    {
+      "relative_path": "tests/stateful-relay-wake-delivery.test.mjs",
+      "size_bytes": 33574,
+      "sha256": "96cbbe1db9b59968d33d32f580a677df6a3a7cade3ef32ee669b298a481d1e74"
+    },
+    {
+      "relative_path": "tests/stateful-relay-wake-recovery-claim-metadata.test.mjs",
+      "size_bytes": 23829,
+      "sha256": "40207409b0ad002740b192c30e22404982d4809f6e33117e37742a81aecb4bbd"
+    },
+    {
+      "relative_path": "tests/stateful-relay-wake-resume.test.mjs",
+      "size_bytes": 14919,
+      "sha256": "2ff7535d64e69d80980ac897ee8f39629906ad00bba1a79139ed1b50e7cdf7af"
+    },
+    {
+      "relative_path": "tests/windows-stateful-relay-native-wakeup-sink.test.mjs",
+      "size_bytes": 7651,
+      "sha256": "80a71f716acb066aca9a4fbe14376a73067450bd685a546ba2997dfb74e935d5"
+    }
+  ],
+  "public_file_count": 89,
+  "public_file_inventory_digest": "7608e6039c0ca21ea05f33ad12760ca32e6cc61d51930a7a128eb8f99acaf708",
+  "inventory_rule": "SHA256 of UTF8 compact JSON with sorted object keys of public_files ordered by relative_path; excludes only this manifest to avoid recursive hashing. The final candidate commit and binary patch bind this manifest.",
+  "public_included_file_count": 46,
+  "public_diff_classification": [
+    {
+      "relative_path": ".gitattributes",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "CHANGELOG.md",
+      "classification": "PUBLIC_DOC_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "MCP_DEPLOYMENT_ADAPTER.md",
+      "classification": "PUBLIC_DOC_REQUIRED",
+      "origin": "PUBLIC_DOCUMENTATION_OR_TEST_ADAPTATION",
+      "included": true
+    },
+    {
+      "relative_path": "PROGRESS.md",
+      "classification": "PUBLIC_DOC_REQUIRED",
+      "origin": "PUBLIC_DOCUMENTATION_OR_TEST_ADAPTATION",
+      "included": true
+    },
+    {
+      "relative_path": "PUBLIC_DEPENDENCY_MANIFEST.md",
+      "classification": "PUBLIC_DOC_REQUIRED",
+      "origin": "PUBLIC_DOCUMENTATION_OR_TEST_ADAPTATION",
+      "included": true
+    },
+    {
+      "relative_path": "PUBLIC_RELEASE_CANDIDATE_MANIFEST.md",
+      "classification": "PUBLIC_DOC_REQUIRED",
+      "origin": "PUBLIC_DOCUMENTATION_OR_TEST_ADAPTATION",
+      "included": true
+    },
+    {
+      "relative_path": "README.md",
+      "classification": "PUBLIC_DOC_REQUIRED",
+      "origin": "PUBLIC_DOCUMENTATION_OR_TEST_ADAPTATION",
+      "included": true
+    },
+    {
+      "relative_path": "STATEFUL_RELAY_V13_GOLDEN_FREEZE_MANIFEST.md",
+      "classification": "PUBLIC_DOC_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "TASKS.md",
+      "classification": "PUBLIC_DOC_REQUIRED",
+      "origin": "PUBLIC_DOCUMENTATION_OR_TEST_ADAPTATION",
+      "included": true
+    },
+    {
+      "relative_path": "deployment/deployment-owner-identity.ps1",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "deployment/start-stateful-relay-native-wakeup-once.ps1",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "deployment/stateful-relay-native-wakeup-launcher-contract.ps1",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "deployment/stateful-relay-native-wakeup-once.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "deployment/stateful-relay-public-maintenance.manifest.json",
+      "classification": "PUBLIC_DOC_REQUIRED",
+      "origin": "PUBLIC_DOCUMENTATION_OR_TEST_ADAPTATION",
+      "included": true
+    },
+    {
+      "relative_path": "deployment/stateful-relay-v13-golden-source.manifest.json",
+      "classification": "PUBLIC_DOC_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "mcp-server.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "native-agent-relay-consumer.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "package.json",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "project-read-data-plane.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-agent-relay-consumer.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-agent-relay-lifecycle.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-agent-relay-manual-dispatch.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-agent-relay-notification.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-agent-relay-operator.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-agent-relay-recovery.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-agent-relay-store.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-bounded-write-fixture.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-bounded-write.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-capability.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-codex-invocation-profile-v1.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-mcp-adapter.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-native-mailbox-bounded-write.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-native-readonly-executor.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-skill-payload.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-task-claimant-authority-v1.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-v13-legacy-claimant-manifest-v1.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-wake-delivery.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-agent-relay-operator.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-relay-codex-invocation-profile.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-relay-golden-manifest.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-relay-legacy-claimant-authority.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-relay-legacy-migration.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-relay-native-post-login-repair.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-relay-native-readonly-executor.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-relay-native-wakeup.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "origin": "GOLDEN_EXACT_BYTES",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-relay-public-maintenance.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "origin": "PUBLIC_DOCUMENTATION_OR_TEST_ADAPTATION",
+      "included": true
+    }
+  ],
+  "golden_diff_classification": [
+    {
+      "relative_path": ".gitattributes",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "a13704f82e0103bac93100a3cbd2db230d3bc811a08cef10cdb83295f3ca720c",
+      "included": true
+    },
+    {
+      "relative_path": "CHANGELOG.md",
+      "classification": "PUBLIC_DOC_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "7818427f44cf75a078f689835eddbe4ceb777eb0df28265f94cb9f6b97c00613",
+      "included": true
+    },
+    {
+      "relative_path": "PROGRESS.md",
+      "classification": "PUBLIC_DOC_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "81ef8700436651338caa8419247f6cad1b78ebc5c0cb7b3ecee61d74ba36b302",
+      "included": true
+    },
+    {
+      "relative_path": "STATEFUL_RELAY_V13_GOLDEN_FREEZE_MANIFEST.md",
+      "classification": "PUBLIC_DOC_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "6f94abc89a2532026eccb10c009430620f00b3d1a47187b15f6354052db0e26b",
+      "included": true
+    },
+    {
+      "relative_path": "TASKS.md",
+      "classification": "PUBLIC_DOC_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "8ea0a4d5ded1ddf3a7b1f3c294ffea57a7eeb242b604d1cb36bf6425c330ebff",
+      "included": true
+    },
+    {
+      "relative_path": "deployment/deployment-owner-identity.ps1",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "0b2fc798b7eddf3303636bb1c4bc61612c1ef8a985f1cc5765ef72bdee401d83",
+      "included": true
+    },
+    {
+      "relative_path": "deployment/start-stateful-relay-native-wakeup-once.ps1",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "2661699a880e1c38b8320dff0f49bd71784b80a8cd088ee6b99fe81b9d13b4a0",
+      "included": true
+    },
+    {
+      "relative_path": "deployment/stateful-relay-native-wakeup-launcher-contract.ps1",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "dfcaac4f45dd4d8dd9cb0b7afd786e856d10515a668267d1474bbc2b35df089d",
+      "included": true
+    },
+    {
+      "relative_path": "deployment/stateful-relay-native-wakeup-once.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "7f981a30b64ac29aaf2bb80f658382ffc2c27a345254d86ab119930a4a20cdd9",
+      "included": true
+    },
+    {
+      "relative_path": "deployment/stateful-relay-v13-golden-source.manifest.json",
+      "classification": "PUBLIC_DOC_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "3f0e59288853560556a57a90f89c94e12b799eddf54bc03f79a6a6e052f6b723",
+      "included": true
+    },
+    {
+      "relative_path": "mcp-server.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "d526ecc68068852b707073fd1c67919ada4721b531bcaa879d72667c4c62b4a5",
+      "included": true
+    },
+    {
+      "relative_path": "native-agent-relay-consumer.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "2fdbcf4f8376204665b2be8d04e9832c80328a2e8e8a4d0ba0775bebe79ab496",
+      "included": true
+    },
+    {
+      "relative_path": "package.json",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "895ca449d9e4451fd54a50db3fb0be476afca8c28e71457cf43d7b84621a5894",
+      "included": true
+    },
+    {
+      "relative_path": "project-read-data-plane.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "7d8923b03360f0a8b4e02811bb80e70b14b2b686d9b16f218c16ae551fa81583",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-agent-relay-consumer.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "dc9bfdc073910321f9c442f3d147827454d99e96f0f2809121dfbe64e3bf3346",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-agent-relay-lifecycle.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "afec20a10cdf72731a9e698a96cad987b01887066da15b65231a3d061a04dfd0",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-agent-relay-manual-dispatch.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "650c4afab1d7d44fb1a42d71ab821630039870f092e7a21afcc5daf63176831d",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-agent-relay-notification.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "22c9d8cdcd9af02ae5ce6e1cee24bee386bc2ede7962c0a166e9177782596f89",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-agent-relay-operator.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "66383350ff22b3e1c7c381b755d0028ec90b74c8ee8551174b221f74186134a6",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-agent-relay-recovery.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "5dc9fcb609252181d36b2bc0a9ad13cd4e06d555b11b292625f618407f7bbff4",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-agent-relay-store.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "bbc473f43a5e20a860ca55476bc03bf797d97278bcd7f05c5cd6d67f5f195576",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-bounded-write-fixture.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "e6be03870dc3846a3d6fe388293057fa70ce042baa09b1ed5ef25ed89ce04337",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-bounded-write.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "d986c6447e5b471289615bc0dd396768db7035d06dd574a3595904d1b3bac187",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-capability.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "ae200bad3bdd7b4d41d63c47ccb7620ab11a68c4368cbf8937b300c1689d1926",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-codex-invocation-profile-v1.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "9001fe3f83f6cc423919de4b528f10140c1fa94db07e3b32fc68370bf5525d61",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-mcp-adapter.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "459d3b7be3b007b4c667cbdf2805fbfd38b23cf7bfa416c96b52ae396ad27fd2",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-native-mailbox-bounded-write.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "1b7fbbf74df61defa391ccf30c0e2a191663017bf2400d7e290548fd131ea6b8",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-native-readonly-executor.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "76e1372955b985f7b4b3aca7db019a75c8b78df7e04f0a710825f625fc6e5a23",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-skill-payload.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "e3ba2dfb0a09206b86ce45315ca7df7fe83e2dcdccb15fb793f393f0f30d3cf6",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-task-claimant-authority-v1.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "95cffdb16695b9893c58b9a96b16ee24de16e1c083114fadc41ceb35a0a611f2",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-v13-legacy-claimant-manifest-v1.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "39f51b9952377ccca82b9302e5212014c3e82cd4242f1d69706b94c3d969d47b",
+      "included": true
+    },
+    {
+      "relative_path": "stateful-relay-wake-delivery.mjs",
+      "classification": "PUBLIC_CORE_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "32496fb0ae084ca69ca171cec42399c391ac3ac8454b44895d7f303edbb85d6b",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-agent-relay-operator.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "a31391ecbfe0f09d7181259ee9ec50e6d265edaf79b123363d6fc2916df9f899",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-relay-codex-invocation-profile.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "791b231ede5fb7a4f122ac034a13970b809e93a1c8548c502efab30f26f7d5f7",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-relay-golden-manifest.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "c8dac49ebd71e88c82123cd8ba4abcfc968203455cabf10cd82be9676eb0c59e",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-relay-legacy-claimant-authority.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "d8b853cf3398aca92b6fb54752f032e47566ee4ae3212e571df85d7af54b3868",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-relay-legacy-migration.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "803a3ce697b5d98c0d85333c02dcd9efa2b96a7ba316b777f904aa0828a69840",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-relay-native-post-login-repair.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "b06324a4c34594bff76588a9e53c3083b6c97979527206bb9da3e90bf36bab4d",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-relay-native-readonly-executor.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "4aef9ff6e2a160f99cb6b7faeb28fca1674b231e9c885b4e668f293e309cd666",
+      "included": true
+    },
+    {
+      "relative_path": "tests/stateful-relay-native-wakeup.test.mjs",
+      "classification": "PUBLIC_TEST_REQUIRED",
+      "source_commit": "ac3e6222aa58c3f81ff77f240bd5d7d0aca4ee83",
+      "source_sha256": "cf91a5bfb6a31dab602ac3813fec192f2e47c0cee30df224ccc545c4fc88d6be",
+      "included": true
+    }
+  ],
+  "excluded_private_files": [
+    {
+      "relative_path": "deployment/bootstrap-stateful-relay-v15c2a-legacy-claimant-once.mjs",
+      "classification": "PRIVATE_DEPLOYMENT_ONLY"
+    },
+    {
+      "relative_path": "deployment/probe-stateful-relay-native-post-login.mjs",
+      "classification": "PRIVATE_DEPLOYMENT_ONLY"
+    },
+    {
+      "relative_path": "deployment/run-stateful-relay-v15c2a-legacy-continuity-canary-once.mjs",
+      "classification": "NOT_FOR_PUBLICATION"
+    },
+    {
+      "relative_path": "deployment/stateful-relay-native-post-login-repair.manifest.json",
+      "classification": "MACHINE_SPECIFIC"
+    },
+    {
+      "relative_path": "deployment/stateful-relay-native-post-login.staged.json",
+      "classification": "MACHINE_SPECIFIC"
+    },
+    {
+      "relative_path": "stateful-relay-v15c2a-legacy-bootstrap-v1.mjs",
+      "classification": "PRIVATE_DEPLOYMENT_ONLY"
+    }
+  ],
+  "public_excluded_private_file_count": 6,
+  "exclusion_count_scope": "Six named accepted deployment/probe/activation input files omitted from reconstruction and public source. Credential and state directories are excluded without inventorying their contents.",
+  "excluded_categories": [
+    {
+      "classification": "SECURITY_SENSITIVE",
+      "content": "Credentials, OAuth/session state, personal SID/account mapping and Credential Manager data"
+    },
+    {
+      "classification": "MACHINE_SPECIFIC",
+      "content": "Real project roots, runtime absolute paths and private RootBinding values"
+    },
+    {
+      "classification": "NOT_FOR_PUBLICATION",
+      "content": "Live queue/databases, task/result payloads, private journals, CODEX_HOME state and visualization artifacts"
+    }
+  ],
+  "mcp_surface": {
+    "advertised_tools": [
+      {
+        "name": "ping",
+        "availability": "AVAILABLE"
+      },
+      {
+        "name": "list_allowed_projects",
+        "availability": "AVAILABLE"
+      },
+      {
+        "name": "list_project_files",
+        "availability": "AVAILABLE"
+      },
+      {
+        "name": "search_project",
+        "availability": "AVAILABLE"
+      },
+      {
+        "name": "read_project_file",
+        "availability": "AVAILABLE"
+      },
+      {
+        "name": "dispatch",
+        "availability": "AVAILABLE"
+      },
+      {
+        "name": "dispatch_bounded_write",
+        "availability": "EXPERIMENTAL"
+      },
+      {
+        "name": "results",
+        "availability": "AVAILABLE"
+      }
+    ],
+    "dispatch_project_ids": [
+      "classroom",
+      "investment",
+      "exam",
+      "second_brain"
+    ],
+    "dispatch_execution_mode": "read_only",
+    "bounded_write": "ADVERTISED_BUT_DISABLED_UNLESS_OWNER_GATED",
+    "results_semantics": "DELIVER_AND_ACK_NEXT_RESULT",
+    "manual_library_operations_not_mcp_tools": [
+      "inbox",
+      "report",
+      "resume",
+      "status",
+      "review"
+    ],
+    "not_shipped": [
+      "Supervisor V1.5",
+      "dynamic Registry",
+      "local-operation extensions",
+      "V1.5 claimant implementation"
+    ],
+    "stable_mcp_initialize_version": "1.0.0-stateful-relay.1",
+    "package_version": "1.0.0-stateful-relay.3",
+    "availability_is_source_contract_not_live_installation": true
+  },
+  "live_evidence_reuse": "PASS_EXACT_ACCEPTED_SOURCE_BYTE_IDENTITY",
+  "new_live_canary_executed": false,
+  "supervisor_v15_included": false,
+  "validation": {
+    "status": "PASS",
+    "tests": 292,
+    "suites": 0,
+    "pass": 292,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "byte_identical_export": true,
+    "export_outside_project_workspace": true,
+    "isolated_empty_codex_home": true,
+    "private_deployment_environment_removed": true,
+    "private_sibling_fixture_dependency": false,
+    "live_runtime_or_credentials_used": false
+  },
+  "public_release_ready_for_owner_review": true,
+  "push_performed": false,
+  "final_public_tag_created": false
+}

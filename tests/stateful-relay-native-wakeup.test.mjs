@@ -517,7 +517,7 @@ test("30 native one-shot wires fixed recoverable pre-claim reconciliation withou
     ),
     "utf8",
   );
-  assert.match(source, /selected = selectCorrelatedSignal\(config\.signal_spool_directory\)/u);
+  assert.match(source, /selected = selectCorrelatedSignal\(config\.signal_spool_directory, config\.database_path\)/u);
   assert.match(source, /reconcileNativeWakeupPreclaimFailure/u);
   assert.match(source, /recordStatefulRelayWakePreclaimFailure/u);
   assert.match(source, /normalizeNativeWakeupPreclaimSubstage/u);

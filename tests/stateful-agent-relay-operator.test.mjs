@@ -148,7 +148,7 @@ test("trusted aliases and auth are bound at construction, never supplied by an o
     assert.throws(
       () => createOperatorApi({
         manualDispatch: createDispatch(store),
-        projectAliases: { relay: "D:/projects/outside" },
+        projectAliases: { relay: "/example/outside" },
         gptAuth: GPT_AUTH,
         codexAuth: CODEX_AUTH,
       }),

@@ -17,6 +17,10 @@ import {
 import { buildBoundedWriteTaskBody } from "../stateful-relay-bounded-write.mjs";
 import { STATEFUL_RELAY_SKILL_PAYLOAD_MANIFEST_SHA256 } from "../stateful-relay-skill-payload.mjs";
 import { openStatefulRelayStore } from "../stateful-agent-relay-store.mjs";
+import {
+  activateExistingLegacyClaimantBootstrapInTransactionV1,
+  stageExistingLegacyClaimantBootstrapInTransactionV1,
+} from "../stateful-relay-task-claimant-authority-v1.mjs";
 
 const LEGACY_SCHEMA = `
 PRAGMA foreign_keys = OFF;
@@ -261,6 +265,22 @@ async function withLegacyDatabase(callback) {
   }
 }
 
+function bootstrapFixtureLegacyClaimant(database) {
+  database.exec("BEGIN IMMEDIATE");
+  try {
+    stageExistingLegacyClaimantBootstrapInTransactionV1(database, {
+      updatedAt: "2026-08-26T10:00:03.000Z",
+    });
+    activateExistingLegacyClaimantBootstrapInTransactionV1(database, {
+      updatedAt: "2026-08-26T10:00:04.000Z",
+    });
+    database.exec("COMMIT");
+  } catch (error) {
+    database.exec("ROLLBACK");
+    throw error;
+  }
+}
+
 function businessSnapshot(database) {
   return JSON.stringify({
     tasks: database.prepare(`
@@ -293,6 +313,7 @@ function executionModes(databasePath) {
 async function assertMigrationRejected({ setup, code }) {
   await withLegacyDatabase(async ({ database, databasePath }) => {
     setup(database);
+    bootstrapFixtureLegacyClaimant(database);
     const before = businessSnapshot(database);
     database.close();
     await assert.rejects(
@@ -330,6 +351,7 @@ test("legacy migration preserves read and historical bounded-write semantics wit
       state: "RESULT_READY",
       bounded: true,
     });
+    bootstrapFixtureLegacyClaimant(database);
     const before = businessSnapshot(database);
     database.close();
 
@@ -442,6 +464,7 @@ test("V1.3 reader preserves legacy read/bounded modes and new multi-project read
       state: "RESULT_READY",
       bounded: true,
     });
+    bootstrapFixtureLegacyClaimant(database);
     database.close();
     const store = await openStatefulRelayStore(databasePath);
     try {

@@ -1,4 +1,5 @@
 import { lstat, realpath, stat } from "node:fs/promises";
+import { STATEFUL_RELAY_LEGACY_CLAIMANT_ID } from "./stateful-relay-task-claimant-authority-v1.mjs";
 import path from "node:path";
 
 import { StatefulRelayError } from "./stateful-agent-relay-store.mjs";
@@ -158,6 +159,13 @@ export function createStatefulRelayConsumer({ store, projectRegistry, executeCod
   if (typeof executeCodex !== "function") {
     throw new TypeError("trusted Codex execution workflow is required");
   }
+  if (typeof store.bindTaskClaimantSession !== "function" ||
+      typeof store.claimTaskForClaimant !== "function") {
+    throw new TypeError("claimant-fenced stateful relay store is required");
+  }
+  const claimantContext = store.bindTaskClaimantSession(
+    STATEFUL_RELAY_LEGACY_CLAIMANT_ID,
+  );
 
   const processTask = async (taskId) => {
     const beforeClaim = store.readTask(taskId);
@@ -180,7 +188,11 @@ export function createStatefulRelayConsumer({ store, projectRegistry, executeCod
       beforeClaim.task.project_id,
       beforeClaim.task.execution_mode,
     );
-    const claimed = store.claimTask(taskId);
+    const claimed = store.claimTaskForClaimant({
+      taskId,
+      claimantContext,
+      claimOwner: "CODEX",
+    });
     store.updateState({
       taskId,
       nextState: "RUNNING",

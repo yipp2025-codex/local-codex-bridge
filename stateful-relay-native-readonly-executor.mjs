@@ -12,6 +12,10 @@ import path from "node:path";
 import { TextDecoder } from "node:util";
 
 import { createLifecycleTracker } from "./stateful-agent-relay-lifecycle.mjs";
+import {
+  buildStatefulRelayCodexInvocationArgs,
+  resolveStatefulRelayCodexInvocationProfile,
+} from "./stateful-relay-codex-invocation-profile-v1.mjs";
 
 const SHA256_PATTERN = /^[a-f0-9]{64}$/u;
 const MAX_OUTPUT_BYTES = 1024 * 1024;
@@ -84,16 +88,6 @@ const NATIVE_EXECUTION_ROLE = [
   "Do not invoke Stateful Relay apps, plugins, MCP tools, skills, connectors, or localhost Relay endpoints.",
   "The parent process exclusively owns all Relay state transitions. Return only the task's requested final answer.",
 ].join("\n");
-
-const DISABLED_EXECUTION_FEATURES = Object.freeze([
-  "apps",
-  "plugins",
-  "recommended_plugins",
-  "remote_plugin",
-  "skill_search",
-  "skill_mcp_dependency_install",
-  "tool_suggest",
-]);
 
 const PRIVATE_OUTPUT_DIRECTORY_PREFIX = "stateful-relay-native-output-";
 const MAX_OUTPUT_LAST_MESSAGE_BYTES = 64 * 1024;
@@ -539,9 +533,15 @@ function fixedFailureMessage(code) {
 
 export function createStatefulRelayNativeReadOnlyExecutor(
   deploymentConfig,
-  { spawnImpl = spawn } = {},
+  {
+    spawnImpl = spawn,
+    invocationProfileResolver = resolveStatefulRelayCodexInvocationProfile,
+  } = {},
 ) {
   if (typeof spawnImpl !== "function") throw new TypeError("fixed spawn dependency is required");
+  if (typeof invocationProfileResolver !== "function") {
+    throw new TypeError("fixed invocation profile resolver is required");
+  }
 
   return async function executeCodex({ task, project_id: projectId, execution_mode: executionMode, project_root: projectRoot }) {
     if (
@@ -558,6 +558,19 @@ export function createStatefulRelayNativeReadOnlyExecutor(
       );
     }
     const runtime = await verifyRuntime(deploymentConfig);
+    let invocationProfile;
+    try {
+      invocationProfile = invocationProfileResolver({
+        verified_runtime_sha256: runtime.sha256,
+      });
+    } catch (error) {
+      throw new StatefulRelayNativeReadOnlyExecutorError(
+        error?.code === "CODEX_INVOCATION_PROFILE_UNSUPPORTED"
+          ? error.code
+          : "CODEX_INVOCATION_PROFILE_UNSUPPORTED",
+        "native Codex invocation profile is unsupported",
+      );
+    }
     let outputWorkspace;
     try {
       outputWorkspace = createServerGeneratedOutputFile(runtime.output_directory_path);
@@ -568,23 +581,11 @@ export function createStatefulRelayNativeReadOnlyExecutor(
       );
     }
     try {
-      const args = [
-        "exec",
-        "--ephemeral",
-        "--ignore-user-config",
-        ...DISABLED_EXECUTION_FEATURES.flatMap((feature) => ["--disable", feature]),
-        "--json",
-        "--skip-git-repo-check",
-        "--output-last-message",
-        outputWorkspace.file,
-        "--sandbox",
-        "read-only",
-        "--cd",
-        projectRoot,
-        "--color",
-        "never",
-        "-",
-      ];
+      const args = buildStatefulRelayCodexInvocationArgs({
+        profile: invocationProfile,
+        output_file: outputWorkspace.file,
+        project_root: projectRoot,
+      });
     const startedAt = new Date().toISOString();
     const lifecycleTracker = createLifecycleTracker({
       command: "codex.exe",

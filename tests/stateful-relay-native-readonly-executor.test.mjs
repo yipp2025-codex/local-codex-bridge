@@ -12,9 +12,13 @@ import {
   CODEX_EXIT_CLASSIFICATIONS,
   CODEX_PARSER_CLASSIFICATIONS,
   CODEX_STDERR_CLASSIFICATIONS,
-  createStatefulRelayNativeReadOnlyExecutor,
+  createStatefulRelayNativeReadOnlyExecutor as createProductionExecutor,
   parseCodexJsonl,
 } from "../stateful-relay-native-readonly-executor.mjs";
+import {
+  STATEFUL_RELAY_CODEX_INVOCATION_DIGEST,
+  STATEFUL_RELAY_CODEX_INVOCATION_PROFILE_ID,
+} from "../stateful-relay-codex-invocation-profile-v1.mjs";
 
 const runtimePath = process.execPath;
 const runtimeSha256 = createHash("sha256").update(await readFile(runtimePath)).digest("hex");
@@ -32,6 +36,18 @@ const config = Object.freeze({
   codex_home_path: codexHomePath,
   output_directory_path: outputDirectoryPath,
 });
+
+const testInvocationProfileResolver = () => Object.freeze({
+  profile_id: STATEFUL_RELAY_CODEX_INVOCATION_PROFILE_ID,
+  invocation_digest: STATEFUL_RELAY_CODEX_INVOCATION_DIGEST,
+});
+
+function createStatefulRelayNativeReadOnlyExecutor(deploymentConfig, options = {}) {
+  return createProductionExecutor(deploymentConfig, {
+    ...options,
+    invocationProfileResolver: options.invocationProfileResolver ?? testInvocationProfileResolver,
+  });
+}
 
 function fakeSpawn(calls, {
   code = 0,
@@ -173,6 +189,18 @@ test("runtime hash mismatch fails before process start", async () => {
   await assert.rejects(
     execute({ task: task(), project_id: "classroom", execution_mode: "read_only", project_root: process.cwd() }),
     (error) => error.code === "RELAY_NATIVE_RUNTIME_IDENTITY_MISMATCH",
+  );
+  assert.equal(spawned, false);
+});
+
+test("production executor fails closed for an unprofiled verified binary", async () => {
+  let spawned = false;
+  const execute = createProductionExecutor(config, {
+    spawnImpl: () => { spawned = true; },
+  });
+  await assert.rejects(
+    execute({ task: task(), project_id: "classroom", execution_mode: "read_only", project_root: process.cwd() }),
+    (error) => error.code === "CODEX_INVOCATION_PROFILE_UNSUPPORTED",
   );
   assert.equal(spawned, false);
 });
